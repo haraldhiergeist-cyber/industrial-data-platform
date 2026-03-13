@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: plc-collector-service
+server:
+  port: 8081
+plc:
+  connection-string: "s7://127.0.0.1?controller-type=S7_300"
+  poll-interval-ms: 1000
+  auto-reconnect: true
+  tags:
+    - name: temperature
+      address: "%DB90.DBW0:INT"   # DBW für 16-Bit Word, gefolgt vom PLC4X-Typ
+    - name: pressure
+      address: "%DB90.DBW2:INT"
+    - name: level
+      address: "%DB90.DBW4:INT"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
