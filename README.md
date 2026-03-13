@@ -24,7 +24,7 @@ the use case.
 ## Architecture
 
 PLC / Simulator │ ▼ PLC Collector Service (Spring Boot + Camel + PLC4X)
-│ ├──────────────► Infinispan (current machine state) │ ▼ Kafka Event
+│ ├──────────────► Redis (current machine state) │ ▼ Kafka Event
 Stream │ ▼ Historian Service │ ▼ Postgres Database │ ▼ REST APIs │ ▼
 Angular UI
 
@@ -95,7 +95,7 @@ Backend
 Data & Messaging
 
 -   Apache Kafka
--   Infinispan
+-   Redis
 -   PostgreSQL
 
 Frontend
