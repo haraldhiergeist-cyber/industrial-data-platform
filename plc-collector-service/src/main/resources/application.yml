@@ -1,12 +1,19 @@
 spring:
   application:
     name: plc-collector-service
+  kafka:
+    bootstrap-servers: 10.10.100.20:9092
+  data:
+    redis:
+      host: 10.10.100.30
+      port: 6379    	
 server:
   port: 8081
 plc:
   connection-string: "s7://127.0.0.1?controller-type=S7_300"
   poll-interval-ms: 1000
   auto-reconnect: true
+  source: plc-simulator-1
   tags:
     - name: temperature
       address: "%DB90.DBW0:INT"   # DBW für 16-Bit Word, gefolgt vom PLC4X-Typ
@@ -14,6 +21,7 @@ plc:
       address: "%DB90.DBW2:INT"
     - name: level
       address: "%DB90.DBW4:INT"
+
 
 management:
   endpoints:

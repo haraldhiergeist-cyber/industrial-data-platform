@@ -55,6 +55,25 @@
             <artifactId>camel-spring-boot-starter</artifactId>
             <version>4.18.0</version>
         </dependency>
+        <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-data-redis</artifactId>
+	    </dependency>
+		<dependency>
+	        <groupId>org.apache.camel.springboot</groupId>
+	        <artifactId>camel-kafka-starter</artifactId>
+            <version>4.18.0</version>
+	    </dependency>	
+		<dependency>
+		    <groupId>org.apache.camel.springboot</groupId>
+		    <artifactId>camel-jackson-starter</artifactId>
+            <version>4.18.0</version>
+		</dependency>
+		<dependency>
+            <groupId>com.example.industrial</groupId>
+            <artifactId>industrial-data-platform-contracts</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>

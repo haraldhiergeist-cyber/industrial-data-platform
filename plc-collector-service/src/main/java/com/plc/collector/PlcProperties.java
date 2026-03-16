@@ -9,7 +9,9 @@ import java.util.List;
 public class PlcProperties {
 
     private String connectionString;
+    private String source;
     private long pollIntervalMs = 1000;
+    private boolean autoReconnect;
     private List<TagConfig> tags = new ArrayList<>();
 
     public String getConnectionString() {
@@ -22,6 +24,14 @@ public class PlcProperties {
 
     public long getPollIntervalMs() {
         return pollIntervalMs;
+    }
+    
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public void setPollIntervalMs(long pollIntervalMs) {
@@ -36,7 +46,15 @@ public class PlcProperties {
         this.tags = tags;
     }
 
-    public static class TagConfig {
+    public boolean isAutoReconnect() {
+		return autoReconnect;
+	}
+
+	public void setAutoReconnect(boolean autoReconnect) {
+		this.autoReconnect = autoReconnect;
+	}
+
+	public static class TagConfig {
         private String name;
         private String address;
 

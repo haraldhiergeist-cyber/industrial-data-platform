@@ -6,8 +6,8 @@ import org.apache.plc4x.java.api.PlcDriverManager;
 import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component("plcReader")
@@ -20,10 +20,12 @@ public class PlcReader {
         this.properties = properties;
     }
 
-    public synchronized Map<String, Object> readAll() throws Exception {
+    public synchronized List<PlcReading> readAll() throws Exception {
+
         ensureConnected();
 
         var builder = connection.readRequestBuilder();
+
         for (PlcProperties.TagConfig tag : properties.getTags()) {
             builder.addTagAddress(tag.getName(), tag.getAddress());
         }
@@ -32,9 +34,18 @@ public class PlcReader {
                 .execute()
                 .get(5, TimeUnit.SECONDS);
 
-        Map<String, Object> result = new LinkedHashMap<>();
+        List<PlcReading> result = new ArrayList<>();
+
         for (PlcProperties.TagConfig tag : properties.getTags()) {
-            result.put(tag.getName(), response.getObject(tag.getName()));
+
+            Object value = response.getObject(tag.getName());
+
+            result.add(new PlcReading(
+                    properties.getSource(),
+                    tag.getName(),
+                    tag.getAddress(),
+                    value
+            ));
         }
 
         return result;
@@ -60,4 +71,11 @@ public class PlcReader {
             }
         }
     }
+    
+    public record PlcReading(
+            String source,
+            String tagName,
+            String address,
+            Object value
+    ) {}
 }
