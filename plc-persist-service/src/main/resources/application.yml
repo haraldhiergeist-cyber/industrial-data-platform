@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: plc-persist-service
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+  datasource:
+    url: jdbc:postgresql://postgres.cluster.lab:5432/plcdb
+    username: plcuser
+    password: plcpass
+  jpa:
+      hibernate:
+        ddl-auto: validate
+      open-in-view: false
+      properties:
+        hibernate:
+          format_sql: true
+  kafka:
+      bootstrap-servers: 10.10.100.20:9094
+      consumer:
+        group-id: plc-persist-group
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+        properties:
+          spring.json.trusted.packages: "*"
+          spring.json.value.default.type: com.example.industrial.constacts.event.PlcReadingEvent
+
+app:
+  kafka:
+    topic: plc-readings
