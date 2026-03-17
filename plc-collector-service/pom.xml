@@ -12,7 +12,7 @@
 	<artifactId>plc-collector-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>plc-collector-service</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Service connects to plc and store data to kafka and redis</description>
 	<url/>
 	<licenses>
 		<license/>
