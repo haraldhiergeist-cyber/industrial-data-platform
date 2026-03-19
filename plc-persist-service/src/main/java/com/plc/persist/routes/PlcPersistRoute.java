@@ -1,4 +1,7 @@
 package com.plc.persist.routes;
+import java.util.Map;
+import java.util.Objects;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -18,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 public class PlcPersistRoute extends RouteBuilder {
 
     private final PlcReadingPersistenceService persistenceService;
+    
+    private Map<String, PlcReadingEvent> eventCache;
 
     @Override
     public void configure() {
@@ -55,13 +60,17 @@ public class PlcPersistRoute extends RouteBuilder {
         Integer partition = exchange.getIn().getHeader(KafkaConstants.PARTITION, Integer.class);
         Long offset = exchange.getIn().getHeader(KafkaConstants.OFFSET, Long.class);
 
-        PersistResult result = persistenceService.persist(event, topic, partition, offset);
-
-        if (result == PersistResult.PERSISTED) {
-            log.info("PLC reading persisted: topic={}, partition={}, offset={}", topic, partition, offset);
-        } else {
-            log.info("PLC reading already processed, skipping duplicate: topic={}, partition={}, offset={}",
-                    topic, partition, offset);
+        PlcReadingEvent oldEvent = this.searchInCache(event);
+        if(hasMeaningfulChange(oldEvent, event))
+        {	
+	        PersistResult result = persistenceService.persist(event, topic, partition, offset);
+	        putToCache(event);
+	        if (result == PersistResult.PERSISTED) {
+	            log.info("PLC reading persisted: topic={}, partition={}, offset={}", topic, partition, offset);
+	        } else {
+	            log.info("PLC reading already processed, skipping duplicate: topic={}, partition={}, offset={}",
+	                    topic, partition, offset);
+	        }
         }
     }
 
@@ -74,5 +83,22 @@ public class PlcPersistRoute extends RouteBuilder {
         }
 
         manualCommit.commit();
+    }
+    
+    private boolean hasMeaningfulChange(PlcReadingEvent oldValue, PlcReadingEvent newValue) {
+        if (oldValue == null) {
+            return true;
+        }
+        return !Objects.equals(oldValue.valueAsString(), newValue.valueAsString());
+    }
+    
+    private PlcReadingEvent searchInCache(PlcReadingEvent event)
+    {
+    	return eventCache.get(event.tagName());
+    }
+    
+    private void putToCache(PlcReadingEvent event)
+    {
+    	eventCache.put(event.tagName(), event);
     }
 }
