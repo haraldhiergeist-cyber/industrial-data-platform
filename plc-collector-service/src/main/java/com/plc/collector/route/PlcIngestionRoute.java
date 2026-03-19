@@ -1,4 +1,4 @@
-package com.plc.collector;
+package com.plc.collector.route;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
@@ -33,11 +33,6 @@ public class PlcIngestionRoute extends RouteBuilder {
             .bean("plcReader", "readAll")
             .split(body())
             .process(plcReadingEventProcessor)
-            .multicast()
-                .to("direct:publish-kafka");
-        
-        from("direct:publish-kafka")
-           .routeId("publish-kafka")
            .marshal().json()
            .log("Publishing to Kafka topic " + Topics.PLC_RAW_READINGS + ": ${body}")
            .to("kafka:" + Topics.PLC_RAW_READINGS

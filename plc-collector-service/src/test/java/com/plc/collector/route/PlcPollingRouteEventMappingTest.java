@@ -1,78 +1,76 @@
 package com.plc.collector.route;
 
-import com.example.industrial.contracts.event.PlcReadingEvent;
-import com.example.industrial.contracts.model.Quality;
-import com.plc.collector.PlcReader;
-
-import org.apache.camel.CamelContext;
-import org.apache.camel.EndpointInject;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.AdviceWith;
-import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
+import org.apache.camel.test.spring.junit5.UseAdviceWith;
+import org.apache.camel.builder.AdviceWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import com.plc.collector.service.PlcReader;
+import com.plc.collector.service.PlcReader.PlcReading;
+import com.plc.collector.processor.PlcReadingEventProcessor;
 
 @CamelSpringBootTest
-@SpringBootTest(properties = {
-        "camel.springboot.auto-startup=false",
-        "spring.kafka.bootstrap-servers=localhost:9092"}
-)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@SpringBootTest
+@UseAdviceWith
 class PlcPollingRouteEventMappingTest {
 
     @Autowired
     CamelContext camelContext;
 
     @Autowired
-    ProducerTemplate template;
+    ProducerTemplate producerTemplate;
 
-    @MockitoBean
+    @MockitoBean(name = "plcReader")
     PlcReader plcReader;
 
-    @EndpointInject("mock:kafka")
-    MockEndpoint kafkaMock;
+    @MockitoBean
+    PlcReadingEventProcessor plcReadingEventProcessor;
 
-    @Test
-    void shouldMapReadingToEventBeforePublishing() throws Exception {
-        PlcReader.PlcReading reading =
-                new PlcReader.PlcReading("plc-simulator-1", "temperature", "%DB90.DBW0:INT", 23);
-
-        when(plcReader.readAll()).thenReturn(List.of(reading));
-
+    @BeforeEach
+    void setup() throws Exception {
         AdviceWith.adviceWith(camelContext, "plc-polling", a -> {
-            a.replaceFromWith("direct:test");
-            a.weaveByToUri("direct:publish-kafka").replace().to("mock:kafka");
+            a.replaceFromWith("direct:testStart");
+            a.mockEndpointsAndSkip("kafka:*");
         });
 
         camelContext.start();
 
-        kafkaMock.expectedMessageCount(1);
+        // Processor im Test neutral machen
+        doAnswer(invocation -> null).when(plcReadingEventProcessor).process(org.mockito.ArgumentMatchers.any());
+    }
 
-        template.sendBody("direct:test", null);
+    @Test
+    void shouldReadAllSplitMarshalAndSendEachReadingToKafka() throws Exception {
+        List<PlcReading> readings = List.of(
+            new PlcReading("PLC", "temperature", "%DB90.DBW0:INT", 21),
+            new PlcReading("PLC", "pressure", "%DB90.DBW2:INT", 7),
+            new PlcReading("PLC", "level", "%DB90.DBW4:INT", 42)
+        );
 
-        kafkaMock.assertIsSatisfied();
+        when(plcReader.readAll()).thenReturn(readings);
 
-        PlcReadingEvent event = kafkaMock.getExchanges()
-                .get(0)
-                .getMessage()
-                .getBody(PlcReadingEvent.class);
+        MockEndpoint mockKafka =
+            camelContext.getEndpoint("mock:kafka:plc.raw.readings", MockEndpoint.class);
 
-        assertNotNull(event);
-        assertEquals("plc-simulator-1", event.source());
-        assertEquals("temperature", event.tagName());
-        assertEquals("%DB90.DBW0:INT", event.address());
-        assertEquals("Integer", event.dataType());
-        assertEquals("23", event.valueAsString());
-        assertEquals(Quality.GOOD, event.quality());
-        assertNotNull(event.timestamp());
+        mockKafka.expectedMessageCount(3);
+        mockKafka.message(0).body(String.class).contains("temperature");
+        mockKafka.message(1).body(String.class).contains("pressure");
+        mockKafka.message(2).body(String.class).contains("level");
+
+        producerTemplate.sendBody("direct:testStart", null);
+
+        mockKafka.assertIsSatisfied();
     }
 }

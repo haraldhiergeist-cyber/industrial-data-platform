@@ -2,7 +2,8 @@ package com.plc.collector.processor;
 
 import com.example.industrial.contracts.event.PlcReadingEvent;
 import com.example.industrial.contracts.model.Quality;
-import com.plc.collector.PlcReader.PlcReading;
+import com.plc.collector.service.PlcReader.PlcReading;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
