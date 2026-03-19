@@ -2,9 +2,7 @@ package com.plc.collector.route;
 
 import com.example.industrial.contracts.event.PlcReadingEvent;
 import com.example.industrial.contracts.model.Quality;
-import com.plc.collector.PlcCollectorServiceApplication;
 import com.plc.collector.PlcReader;
-import com.plc.collector.TestJacksonConfig;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
@@ -26,9 +24,7 @@ import static org.mockito.Mockito.when;
 @CamelSpringBootTest
 @SpringBootTest(properties = {
         "camel.springboot.auto-startup=false",
-        "spring.kafka.bootstrap-servers=localhost:9092",
-        "spring.data.redis.host=localhost",
-        "spring.data.redis.port=6379"}
+        "spring.kafka.bootstrap-servers=localhost:9092"}
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class PlcPollingRouteEventMappingTest {
@@ -55,7 +51,6 @@ class PlcPollingRouteEventMappingTest {
         AdviceWith.adviceWith(camelContext, "plc-polling", a -> {
             a.replaceFromWith("direct:test");
             a.weaveByToUri("direct:publish-kafka").replace().to("mock:kafka");
-            a.weaveByToUri("direct:update-redis").remove();
         });
 
         camelContext.start();

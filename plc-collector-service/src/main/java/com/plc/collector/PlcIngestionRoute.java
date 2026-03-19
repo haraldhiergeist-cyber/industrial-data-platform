@@ -5,20 +5,16 @@ import org.springframework.stereotype.Component;
 
 import com.example.industrial.contracts.topic.Topics;
 import com.plc.collector.processor.PlcReadingEventProcessor;
-import com.plc.collector.processor.RedisStateProcessor;
 
 @Component
 public class PlcIngestionRoute extends RouteBuilder {
 	
     private final PlcReadingEventProcessor plcReadingEventProcessor;
-    private final RedisStateProcessor redisStateProcessor;
 
     public PlcIngestionRoute(
-            PlcReadingEventProcessor plcReadingEventProcessor,
-            RedisStateProcessor redisStateProcessor
+            PlcReadingEventProcessor plcReadingEventProcessor
     ) {
         this.plcReadingEventProcessor = plcReadingEventProcessor;
-        this.redisStateProcessor = redisStateProcessor;
     }
 
     @Override
@@ -38,7 +34,7 @@ public class PlcIngestionRoute extends RouteBuilder {
             .split(body())
             .process(plcReadingEventProcessor)
             .multicast()
-                .to("direct:publish-kafka", "direct:update-redis");
+                .to("direct:publish-kafka");
         
         from("direct:publish-kafka")
            .routeId("publish-kafka")
@@ -47,9 +43,5 @@ public class PlcIngestionRoute extends RouteBuilder {
            .to("kafka:" + Topics.PLC_RAW_READINGS
                 + "?brokers={{spring.kafka.bootstrap-servers}}");
 
-        from("direct:update-redis")
-           .routeId("update-redis")
-           . process(redisStateProcessor)
-           .log("Redis state updated under key ${header.redis.key}");
     }
 }

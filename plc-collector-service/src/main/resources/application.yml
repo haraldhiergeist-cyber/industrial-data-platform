@@ -3,10 +3,6 @@ spring:
     name: plc-collector-service
   kafka:
     bootstrap-servers: 10.10.100.20:9092
-  data:
-    redis:
-      host: 10.10.100.30
-      port: 6379    	
 server:
   port: 8081
 plc:
@@ -21,8 +17,6 @@ plc:
       address: "%DB90.DBW2:INT"
     - name: level
       address: "%DB90.DBW4:INT"
-
-
 management:
   endpoints:
     web:

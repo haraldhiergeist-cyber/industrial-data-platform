@@ -55,10 +55,6 @@
             <artifactId>camel-spring-boot-starter</artifactId>
             <version>4.18.0</version>
         </dependency>
-        <dependency>
-	        <groupId>org.springframework.boot</groupId>
-	        <artifactId>spring-boot-starter-data-redis</artifactId>
-	    </dependency>
 		<dependency>
 	        <groupId>org.apache.camel.springboot</groupId>
 	        <artifactId>camel-kafka-starter</artifactId>
