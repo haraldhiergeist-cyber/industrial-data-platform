@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: plc-query-service
+  datasource:
+    url: jdbc:postgresql://postgres.cluster.lab:5432/plcdb
+    username: plcuser
+    password: plcpass
+  jpa:
+      hibernate:
+        ddl-auto: validate
+      open-in-view: false
+      properties:
+        hibernate:
+          format_sql: true
+  redis:
+    data:
+      host: localhost
+      port: 6379
+  kafka:
+    bootstrap-servers: 10.10.100.20:9092
+    consumer:
+      group-id: plc-persist-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.example.industrial.contracts.events"
+        spring.json.value.default.type: com.example.industrial.contracts.events.PlcReadingEvent			
+server:
+  port: 8082
