@@ -34,6 +34,3 @@ public class PlcReadingEventProcessor implements Processor {
         exchange.getMessage().setBody(event);
     }
 }
-
-
-

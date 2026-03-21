@@ -8,7 +8,6 @@ import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.example.industrial.contracts.event.PlcReadingEvent;
-import com.plc.query.domain.PlcReading;
 
 @Configuration
 public class RedisConfig {
@@ -20,7 +19,7 @@ public class RedisConfig {
         // KEY als String
         template.setKeySerializer(new StringRedisSerializer());
 
-        template.setValueSerializer(new JacksonJsonRedisSerializer<>(PlcReading.class));
+        template.setValueSerializer(new JacksonJsonRedisSerializer<>(PlcReadingEvent.class));
 
         template.afterPropertiesSet();
         return template;

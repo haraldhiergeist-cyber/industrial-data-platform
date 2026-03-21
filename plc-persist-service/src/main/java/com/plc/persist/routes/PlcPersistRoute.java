@@ -1,4 +1,5 @@
 package com.plc.persist.routes;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ import com.example.industrial.contracts.event.PlcReadingEvent;
 import com.plc.persist.service.PlcReadingPersistenceService;
 import com.plc.persist.service.PlcReadingPersistenceService.PersistResult;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -23,6 +25,12 @@ public class PlcPersistRoute extends RouteBuilder {
     private final PlcReadingPersistenceService persistenceService;
     
     private Map<String, PlcReadingEvent> eventCache;
+    
+    @PostConstruct
+    public void init()
+    {
+    	eventCache = new HashMap<String, PlcReadingEvent>();
+    }
 
     @Override
     public void configure() {

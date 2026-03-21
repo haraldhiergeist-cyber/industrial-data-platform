@@ -7,7 +7,6 @@ import org.apache.plc4x.java.api.messages.PlcReadResponse;
 import org.springframework.stereotype.Component;
 
 import com.plc.collector.PlcProperties;
-import com.plc.collector.PlcProperties.TagConfig;
 
 import java.util.ArrayList;
 import java.util.List;
