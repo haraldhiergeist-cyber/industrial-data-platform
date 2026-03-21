@@ -61,7 +61,7 @@ update-infra:
     - git config --global user.name "GitLab CI"
     - git config --global http.sslVerify false
   script:
-    - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.fritz.box/root/industrial-data-platform-infra.git
+    - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.fritz.box/harald/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
     - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-industrial-ui") | .newTag) = strenv(IMAGE_TAG)' plc-industrial-ui/overlays/dev/kustomization.yaml
     - git add plc-industrial-ui/overlays/dev/kustomization.yaml
