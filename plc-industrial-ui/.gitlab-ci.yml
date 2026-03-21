@@ -7,7 +7,6 @@ stages:
 variables:
   IMAGE_NAME: harbor.cluster.lab/industrial/plc-industrial-ui
   IMAGE_TAG: $CI_COMMIT_SHORT_SHA
-  DOCKER_TLS_CERTDIR: ""
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -39,9 +38,13 @@ docker-build:
   stage: docker
   image: docker:27
   services:
-    - docker:27-dind
+    - name: docker:27-dind
+      command: ["--dns=192.168.0.211", "--insecure-registry=harbor.cluster.lab"]
+  variables:
+    DOCKER_TLS_CERTDIR: ""
   script:
     - cd plc-industrial-ui
+    - getent hosts harbor.cluster.lab
     - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
     - docker build -t $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:latest .
     - docker push $IMAGE_NAME:$IMAGE_TAG
@@ -56,8 +59,9 @@ update-infra:
     - apk add --no-cache git yq
     - git config --global user.email "ci@cluster.lab"
     - git config --global user.name "GitLab CI"
+    - git config --global http.sslVerify false
   script:
-    - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/root/industrial-data-platform-infra.git
+    - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.fritz.box/root/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
     - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-industrial-ui") | .newTag) = strenv(IMAGE_TAG)' plc-industrial-ui/overlays/dev/kustomization.yaml
     - git add plc-industrial-ui/overlays/dev/kustomization.yaml
