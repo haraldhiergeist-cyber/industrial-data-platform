@@ -1,7 +1,7 @@
 stages:
   - test
   - build
-  - image
+  - docker
   - update-infra
 
 variables:
@@ -18,6 +18,7 @@ test:
   stage: test
   image: node:20-alpine
   script:
+    - cd plc-industrial-ui
     - npm ci
     - npm run lint || true
     - npm run test -- --watch=false --browsers=ChromeHeadless || true
@@ -26,19 +27,21 @@ build:
   stage: build
   image: node:20-alpine
   script:
+    - cd plc-industrial-ui
     - npm ci
     - npm run build
   artifacts:
     paths:
-      - dist/
+      - plc-industrial-ui/dist/
     expire_in: 1 day
 
-image:
-  stage: image
+docker-build:
+  stage: docker
   image: docker:27
   services:
     - docker:27-dind
   script:
+    - cd plc-industrial-ui
     - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
     - docker build -t $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:latest .
     - docker push $IMAGE_NAME:$IMAGE_TAG
@@ -56,7 +59,7 @@ update-infra:
   script:
     - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/root/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
-    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/library/plc-industrial-ui") | .newTag) = strenv(IMAGE_TAG)' plc-industrial-ui/overlays/dev/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-industrial-ui") | .newTag) = strenv(IMAGE_TAG)' plc-industrial-ui/overlays/dev/kustomization.yaml
     - git add plc-industrial-ui/overlays/dev/kustomization.yaml
     - git commit -m "Update plc-industrial-ui image tag to ${IMAGE_TAG}" || echo "No changes to commit"
     - git push
