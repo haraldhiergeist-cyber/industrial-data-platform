@@ -1,0 +1,55 @@
+<div class="p-4">
+    <div class="mb-4">
+        <h2 class="text-2xl font-bold m-0">PLC Industrial Dashboard</h2>
+        <div class="text-color-secondary mt-2">Live data from plc-query-service</div>
+    </div>
+
+    <div class="grid mb-4">
+        <div class="col-12 md:col-4">
+            <p-card header="Temperature">
+                <div class="text-3xl font-bold mb-3">{{ getValue('temperature') }}</div>
+                <p-tag [value]="getQuality('temperature')" [severity]="getSeverity('temperature')"></p-tag>
+            </p-card>
+        </div>
+
+        <div class="col-12 md:col-4">
+            <p-card header="Pressure">
+                <div class="text-3xl font-bold mb-3">{{ getValue('pressure') }}</div>
+                <p-tag [value]="getQuality('pressure')" [severity]="getSeverity('pressure')"></p-tag>
+            </p-card>
+        </div>
+
+        <div class="col-12 md:col-4">
+            <p-card header="Level">
+                <div class="text-3xl font-bold mb-3">{{ getValue('level') }}</div>
+                <p-tag [value]="getQuality('level')" [severity]="getSeverity('level')"></p-tag>
+            </p-card>
+        </div>
+    </div>
+
+    <p-card header="All PLC Readings">
+        <p-table [value]="readings" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Tag</th>
+                    <th>Value</th>
+                    <th>Quality</th>
+                    <th>Timestamp</th>
+                    <th>Source</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+                <tr>
+                    <td>{{ item.tagName }}</td>
+                    <td>{{ item.valueAsString }}</td>
+                    <td>
+                        <p-tag [value]="item.quality" [severity]="getSeverityFromQuality(item.quality)"></p-tag>
+                    </td>
+                    <td>{{ item.timestamp }}</td>
+                    <td>{{ item.source }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+</div>
