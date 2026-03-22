@@ -24,7 +24,7 @@ export class LayoutService {
     layoutConfig = signal<LayoutConfig>({
         preset: 'Aura',
         primary: 'blue',
-        surface: null,
+        surface: "ocean",
         darkTheme: true,
         menuMode: 'static'
     });
