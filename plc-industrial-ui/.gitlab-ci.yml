@@ -39,7 +39,7 @@ docker-build:
   image: docker:27
   services:
     - name: docker:27-dind
-      command: ["--dns=192.168.0.211", "--insecure-registry=harbor.cluster.lab"]
+      command: ["--dns=10.10.100.1", "--insecure-registry=harbor.cluster.lab"]
   variables:
     DOCKER_TLS_CERTDIR: ""
   script:
@@ -61,7 +61,7 @@ update-infra:
     - git config --global user.name "GitLab CI"
     - git config --global http.sslVerify false
   script:
-    - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.fritz.box/harald/industrial-data-platform-infra.git
+    - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
     - export IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
     - yq -i '(.images[] | .name) = "harbor.cluster.lab/industrial/plc-industrial-ui"' web/plc-industrial-ui/overlays/dev/kustomization.yaml
