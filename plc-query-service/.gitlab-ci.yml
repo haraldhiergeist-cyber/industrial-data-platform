@@ -52,7 +52,7 @@ query-update-infra:
     - git clone --branch ${QUERY_INFRA_BRANCH} ${QUERY_INFRA_REPO_URL} infra
     - cd infra
     - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-query-service").newTag) = strenv(QUERY_IMAGE_TAG)' ${QUERY_INFRA_APP_PATH}/kustomization.yaml
-    - git add ${INFRA_APP_PATH}/kustomization.yaml
+    - git add ${QUERY_INFRA_APP_PATH}/kustomization.yaml
     - |
       if git diff --cached --quiet; then
         echo "No infra changes detected"
