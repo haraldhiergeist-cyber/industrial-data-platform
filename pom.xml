@@ -23,7 +23,6 @@
         <module>industrial-data-platform-contracts</module>
         <module>plc-query-service</module>
     </modules>
-
     <properties>
         <java.version>21</java.version>
     </properties>
