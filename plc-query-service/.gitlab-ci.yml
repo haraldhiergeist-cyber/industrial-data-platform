@@ -48,6 +48,7 @@ query-update-infra:
   script:
     - git config --global user.name "gitlab-ci"
     - git config --global user.email "gitlab-ci@cluster.lab"
+    - git config --global http.sslVerify false
     - git clone --branch ${QUERY_INFRA_BRANCH} ${QUERY_INFRA_REPO_URL} infra
     - cd infra
     - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-query-service").newTag) = strenv(QUERY_IMAGE_TAG)' ${QUERY_INFRA_APP_PATH}/kustomization.yaml
