@@ -1,10 +1,10 @@
 
 variables:
-  IMAGE_NAME: harbor.cluster.lab/industrial/plc-query-service
-  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
-  INFRA_REPO_URL: "https://oauth2:${INFRA_REPO_PUSH_TOKEN}@gitlab.cluster.lab/root/industrial-data-platform-infra.git"
-  INFRA_BRANCH: "main"
-  INFRA_APP_PATH: "api/plc-query-service/overlays/dev"
+  QUERY_IMAGE_NAME: harbor.cluster.lab/industrial/plc-query-service
+  QUERY_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  QUERY_INFRA_REPO_URL: "https://oauth2:${INFRA_REPO_PUSH_TOKEN}@gitlab.cluster.lab/root/industrial-data-platform-infra.git"
+  QUERY_INFRA_BRANCH: "main"
+  QUERY_INFRA_APP_PATH: "api/plc-query-service/overlays/dev"
 
 build:
   stage: build
@@ -31,9 +31,9 @@ docker-build:
     DOCKER_TLS_CERTDIR: ""
   script:
     - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
-    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest .
-    - docker push ${IMAGE_NAME}:${IMAGE_TAG}
-    - docker push ${IMAGE_NAME}:latest
+    - docker build -t ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG} -t ${QUERY_IMAGE_NAME}:latest .
+    - docker push ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG}
+    - docker push ${QUERY_IMAGE_NAME}:latest
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
@@ -47,16 +47,16 @@ update-infra:
   script:
     - git config --global user.name "gitlab-ci"
     - git config --global user.email "gitlab-ci@cluster.lab"
-    - git clone --branch ${INFRA_BRANCH} ${INFRA_REPO_URL} infra
+    - git clone --branch ${QUERY_INFRA_BRANCH} ${QUERY_INFRA_REPO_URL} infra
     - cd infra
-    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-query-service").newTag) = strenv(IMAGE_TAG)' ${INFRA_APP_PATH}/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-query-service").newTag) = strenv(QUERY_IMAGE_TAG)' ${QUERY_INFRA_APP_PATH}/kustomization.yaml
     - git add ${INFRA_APP_PATH}/kustomization.yaml
     - |
       if git diff --cached --quiet; then
         echo "No infra changes detected"
       else
-        git commit -m "plc-query-service -> ${IMAGE_TAG}"
-        git push origin ${INFRA_BRANCH}
+        git commit -m "plc-query-service -> ${QUERY_IMAGE_TAG}"
+        git push origin ${QUERY_INFRA_BRANCH}
       fi
   dependencies: []
   rules:
