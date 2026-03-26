@@ -49,10 +49,16 @@ query-update-infra:
     - git config --global user.name "gitlab-ci"
     - git config --global user.email "gitlab-ci@cluster.lab"
     - git config --global http.sslVerify false
-    - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
+    - git clone --branch ${QUERY_INFRA_BRANCH} https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
     - export QUERY_IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
+    - echo "QUERY_INFRA_APP_PATH=${QUERY_INFRA_APP_PATH}"
+    - echo "QUERY_IMAGE_TAG=${QUERY_IMAGE_TAG}"
+    - echo "----- BEFORE -----"
+    - cat ${QUERY_INFRA_APP_PATH}/kustomization.yaml
     - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-query-service").newTag) = strenv(QUERY_IMAGE_TAG)' ${QUERY_INFRA_APP_PATH}/kustomization.yaml
+    - echo "----- AFTER ------"
+    - cat ${QUERY_INFRA_APP_PATH}/kustomization.yaml
     - git add ${QUERY_INFRA_APP_PATH}/kustomization.yaml
     - |
       if git diff --cached --quiet; then
