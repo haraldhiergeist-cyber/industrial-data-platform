@@ -43,7 +43,6 @@ ui-docker-build:
     - name: docker:27-dind
       command: ["--dns=10.10.100.1", "--insecure-registry=harbor.cluster.lab"]
   variables:
-    DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
     - cd plc-industrial-ui
