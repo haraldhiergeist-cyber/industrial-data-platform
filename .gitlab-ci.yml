@@ -1,2 +1,3 @@
 include:
   - local: 'plc-industrial-ui/.gitlab-ci.yml'
+  - local: 'plc-query-service/.gitlab-ci.yml'
