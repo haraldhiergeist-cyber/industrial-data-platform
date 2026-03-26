@@ -3,16 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+	   <groupId>com.example.industrial</groupId>
+       <artifactId>industrial-data-platform</artifactId>
+       <version>0.0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.plc.query</groupId>
 	<artifactId>plc-query-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>plc-query-service</name>
-	<description>Persists PlcEventData from Kafka to Postgresql DB</description>
+	<description>put events from kafka to redis and provides rest endpoints for angular</description>
 	<url/>
 	<licenses>
 		<license/>
