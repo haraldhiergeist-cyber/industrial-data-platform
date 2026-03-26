@@ -1,6 +1,6 @@
 stages:
   - build
-  - image
+  - docker-build
   - update-infra
 
 variables:
@@ -24,7 +24,7 @@ build:
       changes:
         - plc-query-service/**
 
-image:
+docker-build:
   stage: image
   image: docker:27.3.1
   services:
