@@ -1,45 +1,46 @@
 
 variables:
-  IMAGE_NAME: harbor.cluster.lab/industrial/plc-query-service
-  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
-  INFRA_REPO_URL: "https://oauth2:${INFRA_REPO_PUSH_TOKEN}@gitlab.cluster.lab/root/industrial-data-platform-infra.git"
-  INFRA_BRANCH: "main"
-  INFRA_APP_PATH: "api/plc-query-service/overlays/dev"
+  QUERY_IMAGE_NAME: harbor.cluster.lab/industrial/plc-query-service
+  QUERY_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  QUERY_INFRA_REPO_URL: "https://oauth2:${INFRA_REPO_PUSH_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git"
+  QUERY_INFRA_BRANCH: "main"
+  QUERY_INFRA_APP_PATH: "api/plc-query-service/overlays/dev"
 
-build:
+query-build:
   stage: build
   image: maven:3.9.9-eclipse-temurin-21
   script:
     - mvn -B -DskipTests -pl ./plc-query-service -am clean package
   artifacts:
     paths:
-      - target/*.jar
+      - plc-query-service/target/*.jar
     expire_in: 1 day
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
         - plc-query-service/**
 
-docker-build:
+query-docker-build:
   stage: docker
-  image: docker:27.3.1
+  image: docker:27
   services:
-    - name: docker:27.3.1-dind
+    - name: docker:27-dind
       command: ["--dns=10.10.100.1", "--insecure-registry=harbor.cluster.lab"]
   variables:
-    DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
+    - cd plc-query-service
+    - getent hosts harbor.cluster.lab
     - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
-    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest .
-    - docker push ${IMAGE_NAME}:${IMAGE_TAG}
-    - docker push ${IMAGE_NAME}:latest
+    - docker build -t ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG} -t ${QUERY_IMAGE_NAME}:latest .
+    - docker push ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG}
+    - docker push ${QUERY_IMAGE_NAME}:latest
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
         - plc-query-service/**
 
-update-infra:
+query-update-infra:
   stage: update-infra
   image: alpine:3.20
   before_script:
@@ -47,16 +48,24 @@ update-infra:
   script:
     - git config --global user.name "gitlab-ci"
     - git config --global user.email "gitlab-ci@cluster.lab"
-    - git clone --branch ${INFRA_BRANCH} ${INFRA_REPO_URL} infra
-    - cd infra
-    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-query-service").newTag) = strenv(IMAGE_TAG)' ${INFRA_APP_PATH}/kustomization.yaml
-    - git add ${INFRA_APP_PATH}/kustomization.yaml
+    - git config --global http.sslVerify false
+    - git clone --branch ${QUERY_INFRA_BRANCH} https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
+    - cd industrial-data-platform-infra
+    - export QUERY_IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
+    - echo "QUERY_INFRA_APP_PATH=${QUERY_INFRA_APP_PATH}"
+    - echo "QUERY_IMAGE_TAG=${QUERY_IMAGE_TAG}"
+    - echo "----- BEFORE -----"
+    - cat ${QUERY_INFRA_APP_PATH}/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-query-service").newTag) = strenv(QUERY_IMAGE_TAG)' ${QUERY_INFRA_APP_PATH}/kustomization.yaml
+    - echo "----- AFTER ------"
+    - cat ${QUERY_INFRA_APP_PATH}/kustomization.yaml
+    - git add ${QUERY_INFRA_APP_PATH}/kustomization.yaml
     - |
       if git diff --cached --quiet; then
         echo "No infra changes detected"
       else
-        git commit -m "plc-query-service -> ${IMAGE_TAG}"
-        git push origin ${INFRA_BRANCH}
+        git commit -m "plc-query-service -> ${QUERY_IMAGE_TAG}"
+        git push origin ${QUERY_INFRA_BRANCH}
       fi
   dependencies: []
   rules:
