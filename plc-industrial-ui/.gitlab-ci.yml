@@ -7,7 +7,7 @@ cache:
   paths:
     - node_modules/
 
-test:
+ui-test:
   stage: test
   image: node:20-alpine
   script:
@@ -20,7 +20,7 @@ test:
       changes:
         - plc-industrial-ui/**
 
-build:
+ui-build:
   stage: build
   image: node:20-alpine
   script:
@@ -36,7 +36,7 @@ build:
       changes:
         - plc-industrial-ui/**
 
-docker-build:
+ui-docker-build:
   stage: docker
   image: docker:27
   services:
@@ -56,7 +56,7 @@ docker-build:
       changes:
         - plc-industrial-ui/**
 
-update-infra:
+ui-update-infra:
   stage: update-infra
   image: alpine:3.20
   before_script:
