@@ -30,6 +30,7 @@ query-docker-build:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
+    - getent hosts harbor.cluster.lab
     - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
     - docker build -t ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG} -t ${QUERY_IMAGE_NAME}:latest .
     - docker push ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG}
