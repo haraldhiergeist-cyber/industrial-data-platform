@@ -30,7 +30,7 @@ docker-build:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
-    - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USER" --password-stdin
+    - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest .
     - docker push ${IMAGE_NAME}:${IMAGE_TAG}
     - docker push ${IMAGE_NAME}:latest
