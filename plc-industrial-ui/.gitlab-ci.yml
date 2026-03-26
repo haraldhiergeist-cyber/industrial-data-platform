@@ -1,6 +1,6 @@
 variables:
-  IMAGE_NAME: harbor.cluster.lab/industrial/plc-industrial-ui
-  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  UI_IMAGE_NAME: harbor.cluster.lab/industrial/plc-industrial-ui
+  UI_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -48,9 +48,9 @@ ui-docker-build:
     - cd plc-industrial-ui
     - getent hosts harbor.cluster.lab
     - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:latest .
-    - docker push $IMAGE_NAME:$IMAGE_TAG
-    - docker push $IMAGE_NAME:latest
+    - docker build -t $UI_IMAGE_NAME:$UI_IMAGE_TAG -t $UI_IMAGE_NAME:latest .
+    - docker push $UI_IMAGE_NAME:$UI_IMAGE_TAG
+    - docker push $UI_IMAGE_NAME:latest
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
@@ -67,12 +67,12 @@ ui-update-infra:
   script:
     - git clone https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
-    - export IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
+    - export UI_IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
     - yq -i '(.images[] | .name) = "harbor.cluster.lab/industrial/plc-industrial-ui"' web/plc-industrial-ui/overlays/dev/kustomization.yaml
-    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-industrial-ui") | .newTag) = strenv(IMAGE_TAG)' web/plc-industrial-ui/overlays/dev/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-industrial-ui") | .newTag) = strenv(UI_IMAGE_TAG)' web/plc-industrial-ui/overlays/dev/kustomization.yaml
     - cat web/plc-industrial-ui/overlays/dev/kustomization.yaml
     - git add web/plc-industrial-ui/overlays/dev/kustomization.yaml
-    - git commit -m "Update plc-industrial-ui image tag to ${IMAGE_TAG} [skip ci]" || echo "No changes to commit"
+    - git commit -m "Update plc-industrial-ui image tag to ${UI_IMAGE_TAG} [skip ci]" || echo "No changes to commit"
     - git push
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
