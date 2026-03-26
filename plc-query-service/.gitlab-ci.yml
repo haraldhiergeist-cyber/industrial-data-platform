@@ -11,7 +11,7 @@ build:
   image: maven:3.9.9-eclipse-temurin-21
   script:
     - cd plc-query-service
-    - mvn -B -DskipTests -am clean package
+    - mvn -B -DskipTests -pl plc-query-service -am clean package
   artifacts:
     paths:
       - target/*.jar
