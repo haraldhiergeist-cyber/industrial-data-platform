@@ -12,7 +12,7 @@
 	<artifactId>plc-persist-service</artifactId>
 	
 	<name>plc-persist-service</name>
-	<description>put events from kafka to redis and provides rest services for angular</description>
+	<description>Persists PlcEventData from Kafka to Postgresql DB</description>
 	<url/>
 	
 	<licenses>
