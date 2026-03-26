@@ -28,3 +28,13 @@ spring:
         spring.json.value.default.type: com.example.industrial.contracts.events.PlcReadingEvent			
 server:
   port: ${SERVER_PORT:8082}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
