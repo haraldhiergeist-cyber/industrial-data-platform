@@ -16,9 +16,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
     }
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*");
-    }
+ 	
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+		registry.addEndpoint("/ws")
+            .setAllowedOriginPatterns(
+                    "https://plc-ui.cluster.lab",
+                    "http://localhost:4200"
+            )
+            .withSockJS();
+	}
 }
