@@ -7,7 +7,7 @@
 	   <groupId>com.example.industrial</groupId>
            <artifactId>industrial-data-platform</artifactId>
            <version>0.0.1-SNAPSHOT</version>
-           <relativePath>../persist-pom.xml</relativePath>
+           <relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<groupId>com.plc.persist</groupId>
