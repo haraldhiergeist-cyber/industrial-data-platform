@@ -24,3 +24,27 @@ query-pipeline:
       changes:
         - plc-query-service/**
         - plc-query-service/**/*
+        
+persist-pipeline:
+  stage: trigger
+  trigger:
+    include:
+      - local: 'plc-persist-service/.gitlab-ci.yml'
+    strategy: depend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - plc-persist-service/**
+        - plc-persist-service/**/*        
+        
+collector-pipeline:
+  stage: trigger
+  trigger:
+    include:
+      - local: 'plc-collector-service/.gitlab-ci.yml'
+    strategy: depend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - plc-collector-service/**
+        - plc-collector-service/**/*                

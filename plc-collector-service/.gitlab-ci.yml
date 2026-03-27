@@ -1,0 +1,66 @@
+
+variables:
+  COLLECTOR_IMAGE_NAME: harbor.cluster.lab/industrial/plc-collector-service
+  COLLECTOR_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  COLLECTOR_INFRA_BRANCH: "main"
+  COLLECTOR_INFRA_APP_PATH: "api/plc-collector-service/overlays/dev"
+
+stages:
+  - build
+  - docker
+  - update-infra
+
+collector-build:
+  stage: build
+  image: maven:3.9.9-eclipse-temurin-21
+  script:
+    - mvn -B -DskipTests -pl ./plc-collector-service -am clean package
+  artifacts:
+    paths:
+      - plc-collector-service/target/*.jar
+    expire_in: 1 day
+
+collector-docker-build:
+  stage: docker
+  image: docker:27
+  services:
+    - name: docker:27-dind
+      command: ["--dns=10.10.100.1", "--insecure-registry=harbor.cluster.lab"]
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - cd plc-collector-service
+    - getent hosts harbor.cluster.lab
+    - echo "$HARBOR_PASSWORD" | docker login harbor.cluster.lab -u "$HARBOR_USERNAME" --password-stdin
+    - docker build -t ${COLLECTOR_IMAGE_NAME}:${COLLECTOR_IMAGE_TAG} -t ${COLLECTOR_IMAGE_NAME}:latest .
+    - docker push ${COLLECTOR_IMAGE_NAME}:${COLLECTOR_IMAGE_TAG}
+    - docker push ${COLLECTOR_IMAGE_NAME}:latest
+
+collector-update-infra:
+  stage: update-infra
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache git yq
+  script:
+    - git config --global user.name "gitlab-ci"
+    - git config --global user.email "gitlab-ci@cluster.lab"
+    - git config --global http.sslVerify false
+    - git clone --branch ${COLLECTOR_INFRA_APP_PATH:} https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
+    - cd industrial-data-platform-infra
+    - export COLLECTOR_IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
+    - echo "COLLECTOR_INFRA_APP_PATH=${COLLECTOR_INFRA_APP_PATH}"
+    - echo "COLLECTOR_IMAGE_TAG=${COLLECTOR_IMAGE_TAG}"
+    - echo "----- BEFORE -----"
+    - cat ${COLLECTOR_INFRA_APP_PATH}/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-collector-service").newTag) = strenv(COLLECTOR_IMAGE_TAG)' ${PERSIST_INFRA_APP_PATH}/kustomization.yaml
+    - echo "----- AFTER ------"
+    - cat ${PERSIST_INFRA_APP_PATH}/kustomization.yaml
+    - git add ${PERSIST_INFRA_APP_PATH}/kustomization.yaml
+    - |
+      if git diff --cached --quiet; then
+        echo "No infra changes detected"
+      else
+        git commit -m "plc-collector-service -> ${PERSIST_IMAGE_TAG}"
+        git push origin ${PERSIST_INFRA_APP_PATH:}
+      fi
+  dependencies: []
