@@ -45,7 +45,7 @@ persist-update-infra:
     - git config --global user.name "gitlab-ci"
     - git config --global user.email "gitlab-ci@cluster.lab"
     - git config --global http.sslVerify false
-    - git clone --branch ${PERSIST_INFRA_APP_PATH} https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
+    - git clone --branch ${PERSIST_INFRA_BRANCH} https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
     - export PERSIST_IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
     - echo "PERSIST_INFRA_APP_PATH=${PERSIST_INFRA_APP_PATH}"
@@ -61,6 +61,6 @@ persist-update-infra:
         echo "No infra changes detected"
       else
         git commit -m "plc-persist-service -> ${PERSIST_IMAGE_TAG}"
-        git push origin ${PERSIST_INFRA_APP_PATH}
+        git push origin ${PERSIST_INFRA_BRANCH}
       fi
   dependencies: []
