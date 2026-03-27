@@ -15,7 +15,7 @@ spring:
         hibernate:
           format_sql: true
   kafka:
-      bootstrap-servers: 10.10.100.20:9094
+      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
       consumer:
         group-id: plc-persist-group
         auto-offset-reset: earliest
@@ -24,7 +24,19 @@ spring:
         properties:
           spring.json.trusted.packages: "*"
           spring.json.value.default.type: com.example.industrial.constacts.event.PlcReadingEvent
+server:
+  port: ${SERVER_PORT:8082}
 
 app:
   kafka:
     topic: plc-readings
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

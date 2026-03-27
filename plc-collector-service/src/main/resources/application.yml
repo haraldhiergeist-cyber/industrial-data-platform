@@ -2,7 +2,7 @@ spring:
   application:
     name: plc-collector-service
   kafka:
-    bootstrap-servers: 10.10.100.20:9092
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 server:
   port: 8081
 plc:

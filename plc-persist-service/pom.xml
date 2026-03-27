@@ -52,6 +52,10 @@
             <version>4.18.0</version>
         </dependency>
         <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+        <dependency>
             <groupId>com.example.industrial</groupId>
             <artifactId>industrial-data-platform-contracts</artifactId>
             <version>0.0.1-SNAPSHOT</version>
