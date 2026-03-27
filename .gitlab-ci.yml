@@ -1,9 +1,5 @@
 stages:
   - trigger
-  - test
-  - build
-  - docker
-  - update-infra
 
 ui-pipeline:
   stage: trigger
