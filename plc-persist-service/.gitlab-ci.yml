@@ -14,7 +14,7 @@ persist-build:
   stage: build
   image: maven:3.9.9-eclipse-temurin-21
   script:
-    - mvn -B -DskipTests -pl ./plc-persist-service -am clean package
+    - mvn -B -DskipTests -pl plc-persist-service -am clean package
   artifacts:
     paths:
       - plc-persist-service/target/*.jar
