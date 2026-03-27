@@ -5,6 +5,11 @@ variables:
   QUERY_INFRA_BRANCH: "main"
   QUERY_INFRA_APP_PATH: "api/plc-query-service/overlays/dev"
 
+stages:
+  - build
+  - docker
+  - update-infra
+
 query-build:
   stage: build
   image: maven:3.9.9-eclipse-temurin-21
@@ -14,10 +19,6 @@ query-build:
     paths:
       - plc-query-service/target/*.jar
     expire_in: 1 day
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - plc-query-service/**
 
 query-docker-build:
   stage: docker
@@ -34,10 +35,6 @@ query-docker-build:
     - docker build -t ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG} -t ${QUERY_IMAGE_NAME}:latest .
     - docker push ${QUERY_IMAGE_NAME}:${QUERY_IMAGE_TAG}
     - docker push ${QUERY_IMAGE_NAME}:latest
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - plc-query-service/**
 
 query-update-infra:
   stage: update-infra
@@ -67,7 +64,3 @@ query-update-infra:
         git push origin ${QUERY_INFRA_BRANCH}
       fi
   dependencies: []
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - plc-query-service/**
