@@ -2,7 +2,6 @@
 variables:
   QUERY_IMAGE_NAME: harbor.cluster.lab/industrial/plc-query-service
   QUERY_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
-  QUERY_INFRA_REPO_URL: "https://oauth2:${INFRA_REPO_PUSH_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git"
   QUERY_INFRA_BRANCH: "main"
   QUERY_INFRA_APP_PATH: "api/plc-query-service/overlays/dev"
 
