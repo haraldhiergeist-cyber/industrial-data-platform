@@ -7,6 +7,12 @@ cache:
   paths:
     - node_modules/
 
+stages:
+  - test
+  - build
+  - docker
+  - update-infra
+
 ui-test:
   stage: test
   image: node:20-alpine
@@ -15,10 +21,6 @@ ui-test:
     - npm ci
     - npm run lint || true
     - npm run test -- --watch=false --browsers=ChromeHeadless || true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - plc-industrial-ui/**
 
 ui-build:
   stage: build
@@ -31,10 +33,6 @@ ui-build:
     paths:
       - plc-industrial-ui/dist/
     expire_in: 1 day
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - plc-industrial-ui/**
 
 ui-docker-build:
   stage: docker
@@ -51,10 +49,6 @@ ui-docker-build:
     - docker build -t $UI_IMAGE_NAME:$UI_IMAGE_TAG -t $UI_IMAGE_NAME:latest .
     - docker push $UI_IMAGE_NAME:$UI_IMAGE_TAG
     - docker push $UI_IMAGE_NAME:latest
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - plc-industrial-ui/**
 
 ui-update-infra:
   stage: update-infra
@@ -74,7 +68,3 @@ ui-update-infra:
     - git add web/plc-industrial-ui/overlays/dev/kustomization.yaml
     - git commit -m "Update plc-industrial-ui image tag to ${UI_IMAGE_TAG} [skip ci]" || echo "No changes to commit"
     - git push
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - plc-industrial-ui/**
