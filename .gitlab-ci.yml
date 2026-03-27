@@ -4,6 +4,15 @@ stages:
   - docker
   - update-infra
 
+pipeline-debug:
+  stage: test
+  script:
+    - echo "Pipeline triggered"
+    - echo "Commit=$CI_COMMIT_SHA"
+    - echo "Branch=$CI_COMMIT_BRANCH"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    
 include:
   - local: 'plc-industrial-ui/.gitlab-ci.yml'
   - local: 'plc-query-service/.gitlab-ci.yml'
