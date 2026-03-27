@@ -21,7 +21,7 @@
 
     <modules>
         <module>industrial-data-platform-contracts</module>
-        <module>plc-query-service</module>
+        <module>plc-collector-service</module>
     </modules>
 
     <properties>
