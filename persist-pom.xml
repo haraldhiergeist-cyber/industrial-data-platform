@@ -21,7 +21,7 @@
 
     <modules>
         <module>industrial-data-platform-contracts</module>
-        <module>plc-perists-service</module>
+        <module>plc-persist-service</module>
     </modules>
 
     <properties>
