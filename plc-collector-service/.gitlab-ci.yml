@@ -44,22 +44,22 @@ collector-update-infra:
     - git config --global user.name "gitlab-ci"
     - git config --global user.email "gitlab-ci@cluster.lab"
     - git config --global http.sslVerify false
-    - git clone --branch ${COLLECTOR_INFRA_APP_PATH:} https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
+    - git clone --branch ${COLLECTOR_INFRA_APP_PATH} https://oauth2:${INFRA_REPO_TOKEN}@gitlab.cluster.lab/harald/industrial-data-platform-infra.git
     - cd industrial-data-platform-infra
     - export COLLECTOR_IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
     - echo "COLLECTOR_INFRA_APP_PATH=${COLLECTOR_INFRA_APP_PATH}"
     - echo "COLLECTOR_IMAGE_TAG=${COLLECTOR_IMAGE_TAG}"
     - echo "----- BEFORE -----"
     - cat ${COLLECTOR_INFRA_APP_PATH}/kustomization.yaml
-    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-collector-service").newTag) = strenv(COLLECTOR_IMAGE_TAG)' ${PERSIST_INFRA_APP_PATH}/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "harbor.cluster.lab/industrial/plc-collector-service").newTag) = strenv(COLLECTOR_IMAGE_TAG)' ${COLLECTOR_INFRA_APP_PATH}/kustomization.yaml
     - echo "----- AFTER ------"
-    - cat ${PERSIST_INFRA_APP_PATH}/kustomization.yaml
-    - git add ${PERSIST_INFRA_APP_PATH}/kustomization.yaml
+    - cat ${COLLECTOR_INFRA_APP_PATH}/kustomization.yaml
+    - git add ${COLLECTOR_INFRA_APP_PATH}/kustomization.yaml
     - |
       if git diff --cached --quiet; then
         echo "No infra changes detected"
       else
-        git commit -m "plc-collector-service -> ${PERSIST_IMAGE_TAG}"
-        git push origin ${PERSIST_INFRA_APP_PATH:}
+        git commit -m "plc-collector-service -> ${COLLECTOR_IMAGE_TAG}"
+        git push origin ${COLLECTOR_INFRA_APP_PATH}
       fi
   dependencies: []
