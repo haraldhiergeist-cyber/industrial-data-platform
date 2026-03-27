@@ -11,6 +11,7 @@ ui-pipeline:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
         - plc-industrial-ui/**
+        - plc-industrial-ui/**/*
 
 query-pipeline:
   stage: trigger
@@ -22,5 +23,4 @@ query-pipeline:
     - if: '$CI_COMMIT_BRANCH == "main"'
       changes:
         - plc-query-service/**
-        - industrial-data-platform-contracts/**
-        - pom.xml
+        - plc-query-service/**/*
