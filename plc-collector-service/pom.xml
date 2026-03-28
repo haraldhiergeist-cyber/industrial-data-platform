@@ -47,16 +47,6 @@
 	        <groupId>org.apache.plc4x</groupId>
 	        <artifactId>plc4j-driver-s7</artifactId>
 	        <version>0.13.1</version>
-	        <exclusions>
-	        	<exclusion>
-	        		<groupId>com.fasterxml.jackson.core</groupId>
-	        		<artifactId>jackson-databind</artifactId>
-	        	</exclusion>
-	        	<exclusion>
-	        		<groupId>com.fasterxml.jackson.core</groupId>
-	        		<artifactId>jackson-core</artifactId>
-	        	</exclusion>
-	        </exclusions>
 	    </dependency>
         <!-- Camel Starter -->
 		<dependency>
