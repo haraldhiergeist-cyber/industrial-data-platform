@@ -30,3 +30,6 @@ server:
 app:
   kafka:
     topic: plc-readings
+camel:
+  main:
+    run-controller: true			
