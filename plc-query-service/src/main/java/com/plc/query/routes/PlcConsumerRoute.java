@@ -43,14 +43,8 @@ public class PlcConsumerRoute extends RouteBuilder {
                 + "&breakOnFirstError=true"
                 + "&autoOffsetReset=earliest")
             .routeId("plc-persist-route")
-
-            .autoStartup(false) // Must be started from an external source -> DatabaseReadyRouteStarter
-            
             .unmarshal(plcReadingEventJacksonDataFormat)
-
             .process(this::persistReading)
-
-            .process(this::commitOffset)
 
             .log(LoggingLevel.DEBUG, "Kafka offset committed successfully");
     }
@@ -58,17 +52,7 @@ public class PlcConsumerRoute extends RouteBuilder {
     private void persistReading(Exchange exchange) {
         PlcReadingEvent event = exchange.getIn().getBody(PlcReadingEvent.class);
 
-        plcStateUpdateService.handleIncomingReading(event);    }
+        plcStateUpdateService.handleIncomingReading(event); 
+   }
 
-    private void commitOffset(Exchange exchange) {
-        KafkaManualCommit manualCommit =
-                exchange.getIn().getHeader(KafkaConstants.MANUAL_COMMIT, KafkaManualCommit.class);
-
-        if (manualCommit == null) {
-            throw new IllegalStateException("Kafka manual commit header is missing");
-        }
-
-        manualCommit.commit();
-    }
-    
 }
