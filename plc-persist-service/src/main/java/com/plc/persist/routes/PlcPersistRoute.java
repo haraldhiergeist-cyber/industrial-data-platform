@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.apache.camel.component.kafka.consumer.KafkaManualCommit;
 import org.springframework.dao.DataAccessException;
@@ -16,13 +17,19 @@ import com.plc.persist.service.PlcReadingPersistenceService;
 import com.plc.persist.service.PlcReadingPersistenceService.PersistResult;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 
 @Component
-@RequiredArgsConstructor
 public class PlcPersistRoute extends RouteBuilder {
 
+	private final JacksonDataFormat plcReadingEventJacksonDataFormat;
     private final PlcReadingPersistenceService persistenceService;
+
+    public PlcPersistRoute(
+            JacksonDataFormat plcReadingEventJacksonDataFormat,
+            PlcReadingPersistenceService persistenceService) {
+        this.plcReadingEventJacksonDataFormat = plcReadingEventJacksonDataFormat;
+        this.persistenceService = persistenceService;
+    }
     
     private Map<String, PlcReadingEvent> eventCache;
     
@@ -52,7 +59,7 @@ public class PlcPersistRoute extends RouteBuilder {
 
             .autoStartup(false) // Must be started from an external source -> DatabaseReadyRouteStarter
             
-            .unmarshal().json(PlcReadingEvent.class)
+            .unmarshal(plcReadingEventJacksonDataFormat)
 
             .process(this::persistReading)
 
