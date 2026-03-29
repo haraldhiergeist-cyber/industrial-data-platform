@@ -1,6 +1,7 @@
 package com.plc.collector.route;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.springframework.stereotype.Component;
 
 import com.example.industrial.contracts.topic.Topics;
@@ -10,11 +11,14 @@ import com.plc.collector.processor.PlcReadingEventProcessor;
 public class PlcIngestionRoute extends RouteBuilder {
 	
     private final PlcReadingEventProcessor plcReadingEventProcessor;
+    private final JacksonDataFormat plcReadingEventJacksonDataFormat;
 
     public PlcIngestionRoute(
-            PlcReadingEventProcessor plcReadingEventProcessor
+            PlcReadingEventProcessor plcReadingEventProcessor, JacksonDataFormat plcReadingEventJacksonDataFormat
     ) {
         this.plcReadingEventProcessor = plcReadingEventProcessor;
+        this.plcReadingEventJacksonDataFormat = plcReadingEventJacksonDataFormat;
+       
     }
 
     @Override
@@ -33,7 +37,7 @@ public class PlcIngestionRoute extends RouteBuilder {
             .bean("plcReader", "readAll")
             .split(body())
             .process(plcReadingEventProcessor)
-           .marshal().json()
+            .marshal(plcReadingEventJacksonDataFormat)
            .log("Publishing to Kafka topic " + Topics.PLC_RAW_READINGS + ": ${body}")
            .to("kafka:" + Topics.PLC_RAW_READINGS
                 + "?brokers={{spring.kafka.bootstrap-servers}}");

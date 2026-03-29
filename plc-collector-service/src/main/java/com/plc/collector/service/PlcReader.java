@@ -54,12 +54,24 @@ public class PlcReader {
     }
 
     private void ensureConnected() throws Exception {
-        if (connection == null || !connection.isConnected()) {
+        if (connection == null) {
+            System.out.println("PLC connection is null -> creating new connection");
+            connection = PlcDriverManager.getDefault()
+                    .getConnectionManager()
+                    .getConnection(properties.getConnectionString());
+            return;
+        }
+
+        if (!connection.isConnected()) {
+            System.out.println("PLC connection is disconnected -> reconnecting");
             disconnect();
             connection = PlcDriverManager.getDefault()
                     .getConnectionManager()
                     .getConnection(properties.getConnectionString());
+            return;
         }
+
+        System.out.println("PLC connection still active -> reusing existing connection");
     }
 
     @PreDestroy
