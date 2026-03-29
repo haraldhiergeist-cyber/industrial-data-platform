@@ -38,8 +38,8 @@ public class PlcIngestionRoute extends RouteBuilder {
             .split(body())
             .process(plcReadingEventProcessor)
             .marshal(plcReadingEventJacksonDataFormat)
-           .log("Publishing to Kafka topic " + Topics.PLC_RAW_READINGS + ": ${body}")
-           .to("kafka:" + Topics.PLC_RAW_READINGS
+           .log("Publishing to Kafka topic {{app.kafka.topics.plc-raw-readings}}: ${body}")
+           .to("kafka:{{app.kafka.topics.plc-raw-readings}}"
                 + "?brokers={{spring.kafka.bootstrap-servers}}");
 
     }

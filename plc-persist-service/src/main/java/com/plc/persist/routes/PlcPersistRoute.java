@@ -41,7 +41,7 @@ public class PlcPersistRoute extends RouteBuilder {
         	.backOffMultiplier(2)  // Starts with 2 seconds and ends at 60 seconds
         	.maximumRedeliveryDelay(60000); 
 
-        from("kafka:{{app.kafka.topic}}"
+        from("kafka:{{app.kafka.topics.plc-raw-readings}}"
                 + "?brokers={{spring.kafka.bootstrap-servers}}"
                 + "&groupId={{spring.kafka.consumer.group-id}}"
                 + "&autoCommitEnable=false"

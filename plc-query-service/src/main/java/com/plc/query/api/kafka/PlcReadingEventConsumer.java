@@ -17,7 +17,7 @@ public class PlcReadingEventConsumer {
     }
 
     @KafkaListener(
-            topics = "${app.kafka.topics.plc-raw-readings}",
+            topics = "${app.kafka.topic.plc.raw-readings}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "plcReadingKafkaListenerContainerFactory"
     )

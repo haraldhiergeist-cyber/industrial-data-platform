@@ -29,7 +29,8 @@ server:
 
 app:
   kafka:
-    topic: plc-readings
+    topics:
+      plc-raw-readings: plc.raw.readings
 camel:
   main:
     run-controller: true			
