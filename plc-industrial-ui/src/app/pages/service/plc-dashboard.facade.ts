@@ -1,42 +1,67 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Injectable, computed, signal } from '@angular/core';
 import { PlcReadingEvent } from '../../api';
 import { PlcPollingService } from './plc-polling.service';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlcDashboardFacade {
-  private stop$ = new Subject<void>();
+  private pollingSub?: Subscription;
 
-  private readonly readingsSubject = new BehaviorSubject<PlcReadingEvent[]>([]);
-  readonly readings$ = this.readingsSubject.asObservable();
+  readonly readings = signal<PlcReadingEvent[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+
+  readonly temperature = computed(() => this.findReading('temperature'));
+  readonly pressure = computed(() => this.findReading('pressure'));
+  readonly level = computed(() => this.findReading('level'));
 
   constructor(private pollingService: PlcPollingService) {}
 
   start(intervalMs = 1000): void {
-    this.stopCurrentStream();
+    this.stop();
 
-    this.pollingService.watchAll(intervalMs)
-      .pipe(takeUntil(this.stop$))
-      .subscribe({
-        next: (data) => {
-          this.readingsSubject.next(Array.isArray(data) ? data : []);
-        },
-        error: (err) => {
-          console.error('PLC API error:', err);
-        }
-      });
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.pollingSub = this.pollingService.watchAll(intervalMs).subscribe({
+      next: (data) => {
+        this.readings.set(Array.isArray(data) ? data : []);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('PLC API error:', err);
+        this.error.set('Failed to load PLC readings');
+        this.loading.set(false);
+      }
+    });
   }
 
   stop(): void {
-    this.stopCurrentStream();
+    this.pollingSub?.unsubscribe();
+    this.pollingSub = undefined;
   }
 
-  private stopCurrentStream(): void {
-    this.stop$.next();
-    this.stop$.complete();
-    this.stop$ = new Subject<void>();
+  getReadingSignal(tagName: string) {
+    return computed(() =>
+      this.readings().find((r) => r.tagName === tagName)
+    );
+  }
+
+  getValueSignal(tagName: string) {
+    return computed(() =>
+      this.readings().find((r) => r.tagName === tagName)?.valueAsString ?? '-'
+    );
+  }
+
+  getQualitySignal(tagName: string) {
+    return computed(() =>
+      this.readings().find((r) => r.tagName === tagName)?.quality ?? 'BAD'
+    );
+  }
+
+  private findReading(tagName: string): PlcReadingEvent | undefined {
+    return this.readings().find((r) => r.tagName === tagName);
   }
 }
