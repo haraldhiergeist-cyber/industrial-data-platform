@@ -26,7 +26,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dashboardFacade.start(1000);
+    this.dashboardFacade.start();
   }
 
   ngOnDestroy(): void {

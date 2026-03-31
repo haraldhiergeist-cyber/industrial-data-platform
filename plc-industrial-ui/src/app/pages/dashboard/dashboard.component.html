@@ -5,35 +5,41 @@
     </div>
 
     <div class="grid mb-4">
-        <div class="col-12 md:col-4">
-            <p-card header="Temperature">
-                <div class="text-3xl font-bold mb-3">{{ temperature()?.valueAsString ?? '-' }}</div>
-                <p-tag
-                    [value]="temperature()?.quality ?? 'BAD'"
-                    [severity]="getSeverityFromQuality(temperature()?.quality)">
-                </p-tag>
-            </p-card>
-        </div>
+         @if (temperature(); as temp) {
+            <div class="col-12 md:col-4">
+                <p-card header="Temperature">
+                    <div class="text-3xl font-bold mb-3">{{ temp?.valueAsString ?? '-' }}</div>
+                    <p-tag
+                        [value]="temp?.quality ?? 'BAD'"
+                        [severity]="getSeverityFromQuality(temp?.quality)">
+                    </p-tag>
+                </p-card>
+            </div>
+        }
 
-        <div class="col-12 md:col-4">
-            <p-card header="Pressure">
-                <div class="text-3xl font-bold mb-3">{{ pressure()?.valueAsString ?? '-' }}</div>
-                <p-tag
-                    [value]="pressure()?.quality ?? 'BAD'"
-                    [severity]="getSeverityFromQuality(pressure()?.quality)">
-                </p-tag>
-            </p-card>
-        </div>
+        @if (pressure(); as pres) {
+            <div class="col-12 md:col-4">
+                <p-card header="Pressure">
+                    <div class="text-3xl font-bold mb-3">{{ pres?.valueAsString ?? '-' }}</div>
+                    <p-tag
+                        [value]="pres?.quality ?? 'BAD'"
+                        [severity]="getSeverityFromQuality(pres?.quality)">
+                    </p-tag>
+                </p-card>
+            </div>
+        }
 
-        <div class="col-12 md:col-4">
-            <p-card header="Level">
-                <div class="text-3xl font-bold mb-3">{{ level()?.valueAsString ?? '-' }}</div>
-                <p-tag
-                    [value]="level()?.quality ?? 'BAD'"
-                    [severity]="getSeverityFromQuality(level()?.quality)">
-                </p-tag>
-            </p-card>
-        </div>
+        @if (level(); as lvl) {
+            <div class="col-12 md:col-4">
+                <p-card header="Level">
+                    <div class="text-3xl font-bold mb-3">{{ lvl?.valueAsString ?? '-' }}</div>
+                    <p-tag
+                        [value]="lvl?.quality ?? 'BAD'"
+                        [severity]="getSeverityFromQuality(lvl?.quality)">
+                    </p-tag>
+                </p-card>
+            </div>
+        }
     </div>
 
     <p-card header="All PLC Readings">

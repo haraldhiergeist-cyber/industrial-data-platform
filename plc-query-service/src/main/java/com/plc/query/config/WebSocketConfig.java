@@ -23,7 +23,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             .setAllowedOriginPatterns(
                     "https://plc-ui.cluster.lab",
                     "http://localhost:4200"
-            )
-            .withSockJS();
+            );
 	}
 }
