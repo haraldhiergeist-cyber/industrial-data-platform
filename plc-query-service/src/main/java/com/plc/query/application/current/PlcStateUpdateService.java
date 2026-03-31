@@ -37,13 +37,11 @@ public class PlcStateUpdateService {
             shouldPublish = !Objects.equals(existing.valueAsString(), newValue);
         }
 
-        if (!shouldPublish) {
-            return;
+        if (shouldPublish) {
+        	repository.save(redisKey, event);
+
+        	messagingTemplate.convertAndSend("/topic/plc-updates", event);
         }
-
-        repository.save(redisKey, event);
-
-        messagingTemplate.convertAndSend("/topic/plc-updates", event);
     }
 
     private String buildRedisKey(String source, String tagName) {

@@ -4,8 +4,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
-import org.apache.camel.component.kafka.KafkaConstants;
-import org.apache.camel.component.kafka.consumer.KafkaManualCommit;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
