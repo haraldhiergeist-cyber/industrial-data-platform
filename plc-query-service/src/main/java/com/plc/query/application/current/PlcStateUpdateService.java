@@ -22,7 +22,7 @@ public class PlcStateUpdateService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void handleIncomingReading(PlcReadingEvent event) {
+    public PlcReadingEvent handleIncomingReading(PlcReadingEvent event) {
         String redisKey = buildRedisKey(event.source(), event.tagName());
         String newValue = normalizeValue(event.valueAsString());
 
@@ -42,6 +42,7 @@ public class PlcStateUpdateService {
 
         	messagingTemplate.convertAndSend("/topic/plc-updates", event);
         }
+        return event;
     }
 
     private String buildRedisKey(String source, String tagName) {

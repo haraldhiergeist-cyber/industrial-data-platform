@@ -14,15 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.industrial.contracts.event.PlcReadingEvent;
 import com.plc.query.application.current.CurrentValueService;
+import com.plc.query.application.current.PlcStateUpdateService;
 
 @RestController
 @RequestMapping("/api/plc")
 public class PlcQueryController {
 
     private final CurrentValueService service;
+    PlcStateUpdateService plcStateupdateService;
 
-    public PlcQueryController(CurrentValueService service) {
+    public PlcQueryController(CurrentValueService service, PlcStateUpdateService plcStateupdateService) {
         this.service = service;
+        this.plcStateupdateService = plcStateupdateService;
     }
 
     @GetMapping("/{tag}")
@@ -38,7 +41,7 @@ public class PlcQueryController {
     
     @PostMapping
     public ResponseEntity<PlcReadingEvent> set(@RequestBody PlcReadingEvent reading) {
-    	PlcReadingEvent saved = service.save(reading);
+    	PlcReadingEvent saved = plcStateupdateService.handleIncomingReading(reading);
         return ResponseEntity.ok(saved);
     }
     
