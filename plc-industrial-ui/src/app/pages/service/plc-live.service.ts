@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Client, IMessage } from '@stomp/stompjs';
 import { Subject } from 'rxjs';
 import { PlcReadingEvent } from '../../api';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -20,8 +21,14 @@ export class PlcLiveService {
 
     console.log('STOMP connect() called');
 
+
+
+const wsUrl = environment.apiBasePath
+  .replace(/^http:/, 'ws:')
+  .replace(/^https:/, 'wss:') + '/ws';
+
     this.client = new Client({
-      brokerURL: 'ws://localhost:8082/ws',
+      brokerURL: wsUrl,
       reconnectDelay: 5000,
       debug: (msg) => console.log('[STOMP]', msg)
     });
