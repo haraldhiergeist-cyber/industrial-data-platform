@@ -1,8 +1,14 @@
 import { Routes } from '@angular/router';
-import { Documentation } from './documentation/documentation';
-import { Crud } from './crud/crud';
-import { Empty } from './empty/empty';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 export default [
-    { path: '**', redirectTo: '/notfound' }
+  { path: '', component: DashboardComponent },
+  {
+    path: 'temperature-history',
+    loadComponent: () =>
+      import('./temperature-history/temperature-history.component').then(
+        m => m.TemperatureHistoryComponent
+      )
+  },
+  { path: '**', redirectTo: '/notfound' }
 ] as Routes;

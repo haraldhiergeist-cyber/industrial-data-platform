@@ -17,19 +17,22 @@ import { Observable }                                        from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { PlcReadingEvent } from '../model/plc-reading-event';
+import { PlcReadingEvent } from '../model/plcReadingEvent';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
+import {
+    PlcQueryControllerServiceInterface
+} from './plcQueryController.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class PlcQueryControllerService extends BaseService {
+export class PlcQueryControllerService extends BaseService implements PlcQueryControllerServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
