@@ -4,6 +4,8 @@ README.md
 api.base.service.ts
 api.module.ts
 api/api.ts
+api/measurementHistoryController.service.ts
+api/measurementHistoryController.serviceInterface.ts
 api/plcHistoryController.service.ts
 api/plcHistoryController.serviceInterface.ts
 api/plcQueryController.service.ts
@@ -13,6 +15,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/historyPoint.ts
+model/measurementHistoryPoint.ts
 model/models.ts
 model/plcReadingEvent.ts
 param.ts

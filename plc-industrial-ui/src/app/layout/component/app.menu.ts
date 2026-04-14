@@ -26,7 +26,7 @@ export class AppMenu {
             {
                 label: 'Home',
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
-                        { label: 'Temperature History', icon: 'pi pi-fw pi-chart-line', routerLink: ['/temperature-history'] }]
+                        { label: 'Measurements', icon: 'pi pi-fw pi-chart-line', routerLink: ['/measurements'] }]
             }
         ];
     }

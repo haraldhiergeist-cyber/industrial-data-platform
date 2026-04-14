@@ -8,7 +8,7 @@
          @if (temperature(); as temp) {
             <div class="col-12 md:col-4">
                 <p-card header="Temperature">
-                    <div class="text-3xl font-bold mb-3">{{ temp?.valueAsString ?? '-' }}</div>
+                    <div class="text-3xl font-bold mb-3">{{ temp?.valueAsString ?? '-' }} °C</div>
                     <p-tag
                         [value]="temp?.quality ?? 'BAD'"
                         [severity]="getSeverityFromQuality(temp?.quality)">
@@ -20,7 +20,7 @@
         @if (pressure(); as pres) {
             <div class="col-12 md:col-4">
                 <p-card header="Pressure">
-                    <div class="text-3xl font-bold mb-3">{{ pres?.valueAsString ?? '-' }}</div>
+                    <div class="text-3xl font-bold mb-3">{{ pres?.valueAsString ?? '-' }} bar</div>
                     <p-tag
                         [value]="pres?.quality ?? 'BAD'"
                         [severity]="getSeverityFromQuality(pres?.quality)">
@@ -32,7 +32,7 @@
         @if (level(); as lvl) {
             <div class="col-12 md:col-4">
                 <p-card header="Level">
-                    <div class="text-3xl font-bold mb-3">{{ lvl?.valueAsString ?? '-' }}</div>
+                    <div class="text-3xl font-bold mb-3">{{ lvl?.valueAsString ?? '-' }} %</div>
                     <p-tag
                         [value]="lvl?.quality ?? 'BAD'"
                         [severity]="getSeverityFromQuality(lvl?.quality)">
