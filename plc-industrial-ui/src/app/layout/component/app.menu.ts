@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, effect, inject  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { TranslationService } from '@/app/core/i18n/translation.service';
+
+
 
 @Component({
     selector: 'app-menu',
@@ -21,12 +24,31 @@ import { AppMenuitem } from './app.menuitem';
 export class AppMenu {
     model: MenuItem[] = [];
 
-    ngOnInit() {
+    private readonly translationService = inject(TranslationService);
+
+    constructor() {
+        effect(() => {
+            this.translationService.currentLanguage();
+            this.buildMenu();
+        });
+    }
+
+    private buildMenu(): void {
         this.model = [
             {
-                label: 'Home',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
-                        { label: 'Measurements', icon: 'pi pi-fw pi-chart-line', routerLink: ['/measurements'] }]
+                label: this.translationService.translate('menu.home'),
+                items: [
+                    {
+                        label: this.translationService.translate('menu.dashboard'),
+                        icon: 'pi pi-fw pi-home',
+                        routerLink: ['/']
+                    },
+                    {
+                        label: this.translationService.translate('menu.measurements'),
+                        icon: 'pi pi-fw pi-chart-line',
+                        routerLink: ['/measurements']
+                    }
+                ]
             }
         ];
     }

@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
-
+import { TranslatePipe } from '@/app/core/i18n/translate.pipe';
 import { PlcDashboardFacade } from '../service/plc-dashboard.facade';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   templateUrl: './dashboard.component.html',
-  imports: [CommonModule, CardModule, TagModule, TableModule]
+  imports: [CommonModule, CardModule, TagModule, TableModule, TranslatePipe]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
     readonly readings;
@@ -44,4 +44,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     return 'danger';
   }
+
+  getQualityLabel(quality?: string): string {
+  switch (quality) {
+    case 'GOOD':
+      return 'dashboard.quality.good';
+    case 'UNCERTAIN':
+      return 'dashboard.quality.uncertain';
+    default:
+      return 'dashboard.quality.bad';
+  }
+}
 }

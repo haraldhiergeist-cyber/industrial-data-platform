@@ -1,90 +1,98 @@
 <div class="measurements-page">
-  <div class="page-header">
-    <div>
-      <h1>Measurements</h1>
-      <p class="page-subtitle">
-        Historical measurements for temperature, pressure and level.
-      </p>
-    </div>
+ <div class="page-header">
+  <div>
+    <h1>{{ 'measurements.title' | translate }}</h1>
+    <p class="page-subtitle">
+      {{ 'measurements.subtitle' | translate }}
+    </p>
   </div>
+</div>
 
   <div class="toolbar">
-    <div class="toolbar-group">
-      <label for="metric">Metric</label>
-      <p-select
-        inputId="metric"
-        [options]="metricOptions"
-        optionLabel="label"
-        optionValue="value"
-        [ngModel]="selectedMetric()"
-        (ngModelChange)="onMetricChange($event)">
-      </p-select>
-    </div>
+  <div class="toolbar-group">
+    <label for="metric">{{ 'measurements.metric' | translate }}</label>
+   <p-select
+      inputId="metric"
+      [options]="metricOptions"
+      optionLabel="labelKey"
+      optionValue="value"
+      [ngModel]="selectedMetric()"
+      (ngModelChange)="onMetricChange($event)"
+    >
+      <ng-template pTemplate="item" let-option>
+        {{ option.labelKey | translate }}
+      </ng-template>
 
-    <div class="toolbar-group">
-      <label for="timeRange">Time range</label>
-      <p-select
-        inputId="timeRange"
-        [options]="timeRangeOptions"
-        optionLabel="label"
-        optionValue="value"
-        [ngModel]="selectedRange()"
-        (ngModelChange)="onRangeChange($event)">
-      </p-select>
+      <ng-template pTemplate="selectedItem" let-selectedOption>
+        {{ selectedOption?.labelKey | translate }}
+      </ng-template>
+    </p-select>
+  </div>
+
+  <div class="toolbar-group">
+    <label for="timeRange">{{ 'measurements.timeRange' | translate }}</label>
+    <p-select
+      inputId="timeRange"
+      [options]="timeRangeOptions"
+      optionLabel="labelKey"
+      optionValue="value"
+      [ngModel]="selectedRange()"
+      (ngModelChange)="onRangeChange($event)"
+    >
+      <ng-template let-option #item>
+        {{ option.labelKey | translate }}
+      </ng-template>
+
+      <ng-template let-selectedOption #selectedItem>
+        {{ selectedOption?.labelKey | translate }}
+      </ng-template>
+    </p-select>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-label">{{ 'measurements.min' | translate }}</span>
+    <div class="stat-value">
+      {{ stats().min ?? '-' }} {{ metricConfig().unit }}
     </div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <span class="stat-label">Current</span>
-      <span class="stat-value">
-        {{ stats().current ?? '-' }} {{ metricConfig().unit }}
-      </span>
-    </div>
-
-    <div class="stat-card">
-      <span class="stat-label">Min</span>
-      <span class="stat-value">
-        {{ stats().min ?? '-' }} {{ metricConfig().unit }}
-      </span>
-    </div>
-
-    <div class="stat-card">
-      <span class="stat-label">Max</span>
-      <span class="stat-value">
-        {{ stats().max ?? '-' }} {{ metricConfig().unit }}
-      </span>
-    </div>
-
-    <div class="stat-card">
-      <span class="stat-label">Average</span>
-      <span class="stat-value">
-        {{ stats().average ?? '-' }} {{ metricConfig().unit }}
-      </span>
+  <div class="stat-card">
+    <span class="stat-label">{{ 'measurements.max' | translate }}</span>
+    <div class="stat-value">
+      {{ stats().max ?? '-' }} {{ metricConfig().unit }}
     </div>
   </div>
 
+  <div class="stat-card">
+    <span class="stat-label">{{ 'measurements.average' | translate }}</span>
+    <div class="stat-value">
+      {{ stats().average ?? '-' }} {{ metricConfig().unit }}
+    </div>
+  </div>
+</div>
   @if (loading()) {
-    <div class="state-message">Loading measurement history...</div>
+    <div class="state-message">{{ 'measurements.loading' | translate }}</div>
   }
 
-  @if (error()) {
-    <div class="state-message state-error">{{ error() }}</div>
+  @if (errorKey()) {
+    <div class="state-message state-error">{{ errorKey() | translate }}</div>
   }
 
-  @if (!loading() && !error() && history().length > 0) {
-    <div class="chart-toolbar">
-      <div class="chart-hint">
-        Scroll to zoom • Shift + drag to pan
-      </div>
-
-      <button
-        pButton
-        label="Reset Zoom"
-        icon="pi pi-refresh"
-        (click)="resetZoom()">
-      </button>
+  @if (!loading() && !errorKey() && history().length > 0) {
+  <div class="chart-toolbar">
+    <div class="chart-hint">
+      {{ 'measurements.chartHint' | translate }}
     </div>
+
+    <button
+      pButton
+      [label]="'measurements.resetZoom' | translate"
+      icon="pi pi-refresh"
+      (click)="resetZoom()">
+    </button>
+  </div>
 
     <div class="chart-card">
       <div class="chart-wrapper">
@@ -98,7 +106,7 @@
     </div>
   }
 
-  @if (!loading() && !error() && history().length === 0) {
-    <div class="state-message">No measurement data available.</div>
-  }
+ @if (!loading() && !errorKey() && history().length === 0) {
+  <div class="state-message">{{ errorKey() | translate }}</div>
+}
 </div>

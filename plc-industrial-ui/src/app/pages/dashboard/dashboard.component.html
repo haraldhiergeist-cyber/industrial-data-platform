@@ -1,16 +1,16 @@
 <div class="p-4">
     <div class="mb-4">
-        <h2 class="text-2xl font-bold m-0">PLC Industrial Dashboard</h2>
-        <div class="text-color-secondary mt-2">Live data from plc-query-service</div>
+        <h2 class="text-2xl font-bold m-0">{{ 'dashboard.title' | translate }}</h2>
+        <div class="text-color-secondary mt-2">{{ 'dashboard.subtitle' | translate }}</div>
     </div>
 
     <div class="grid mb-4">
-         @if (temperature(); as temp) {
+        @if (temperature(); as temp) {
             <div class="col-12 md:col-4">
-                <p-card header="Temperature">
+                <p-card [header]="'dashboard.temperature' | translate">
                     <div class="text-3xl font-bold mb-3">{{ temp?.valueAsString ?? '-' }} °C</div>
                     <p-tag
-                        [value]="temp?.quality ?? 'BAD'"
+                        [value]="temp?.quality ?? ('dashboard.quality.bad' | translate)"
                         [severity]="getSeverityFromQuality(temp?.quality)">
                     </p-tag>
                 </p-card>
@@ -19,10 +19,10 @@
 
         @if (pressure(); as pres) {
             <div class="col-12 md:col-4">
-                <p-card header="Pressure">
+                <p-card [header]="'dashboard.pressure' | translate">
                     <div class="text-3xl font-bold mb-3">{{ pres?.valueAsString ?? '-' }} bar</div>
                     <p-tag
-                        [value]="pres?.quality ?? 'BAD'"
+                        [value]="pres?.quality ?? ('dashboard.quality.bad' | translate)"
                         [severity]="getSeverityFromQuality(pres?.quality)">
                     </p-tag>
                 </p-card>
@@ -31,10 +31,10 @@
 
         @if (level(); as lvl) {
             <div class="col-12 md:col-4">
-                <p-card header="Level">
+                <p-card [header]="'dashboard.level' | translate">
                     <div class="text-3xl font-bold mb-3">{{ lvl?.valueAsString ?? '-' }} %</div>
                     <p-tag
-                        [value]="lvl?.quality ?? 'BAD'"
+                        [value]="lvl?.quality ?? ('dashboard.quality.bad' | translate)"
                         [severity]="getSeverityFromQuality(lvl?.quality)">
                     </p-tag>
                 </p-card>
@@ -42,15 +42,15 @@
         }
     </div>
 
-    <p-card header="All PLC Readings">
+    <p-card [header]="'dashboard.allReadings' | translate">
         <p-table [value]="readings()" responsiveLayout="scroll">
             <ng-template pTemplate="header">
                 <tr>
-                    <th>Tag</th>
-                    <th>Value</th>
-                    <th>Quality</th>
-                    <th>Timestamp</th>
-                    <th>Source</th>
+                    <th>{{ 'dashboard.table.tag' | translate }}</th>
+                    <th>{{ 'dashboard.table.value' | translate }}</th>
+                    <th>{{ 'dashboard.table.quality' | translate }}</th>
+                    <th>{{ 'dashboard.table.timestamp' | translate }}</th>
+                    <th>{{ 'dashboard.table.source' | translate }}</th>
                 </tr>
             </ng-template>
 
@@ -60,9 +60,9 @@
                     <td>{{ item.valueAsString }}</td>
                     <td>
                         <p-tag
-                            [value]="item.quality"
+                            [value]="getQualityLabel(item.quality) | translate"
                             [severity]="getSeverityFromQuality(item.quality)">
-                        </p-tag>
+                            </p-tag>
                     </td>
                     <td>{{ item.timestamp }}</td>
                     <td>{{ item.source }}</td>

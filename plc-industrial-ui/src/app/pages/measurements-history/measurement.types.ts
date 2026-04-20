@@ -1,3 +1,31 @@
+
+export interface MetricOption {
+  labelKey: string;
+  value: MetricType;
+}
+
+export interface TimeRangeOption {
+  labelKey: string;
+  value: TimeRange;
+}
+
+export function buildMetricOptions(): MetricOption[] {
+  return [
+    { labelKey: 'metric.temperature', value: 'TEMPERATURE' },
+    { labelKey: 'metric.pressure', value: 'PRESSURE' },
+    { labelKey: 'metric.level', value: 'LEVEL' }
+  ];
+}
+
+export function buildTimeRangeOptions(): TimeRangeOption[] {
+  return [
+    { labelKey: 'timeRange.last5Minutes', value: 'LAST_5_MINUTES' },
+    { labelKey: 'timeRange.last15Minutes', value: 'LAST_15_MINUTES' },
+    { labelKey: 'timeRange.last1Hour', value: 'LAST_1_HOUR' },
+    { labelKey: 'timeRange.last24Hours', value: 'LAST_24_HOURS' }
+  ];
+}
+
 export type MetricType = 'TEMPERATURE' | 'PRESSURE' | 'LEVEL';
 
 export type TimeRange =
@@ -11,23 +39,8 @@ export interface MeasurementHistoryItem {
   value: number;
 }
 
-export interface MeasurementHistoryPointDto {
-  timestamp?: string;
-  value?: number | string;
-}
-
-export interface MetricOption {
-  label: string;
-  value: MetricType;
-}
-
-export interface TimeRangeOption {
-  label: string;
-  value: TimeRange;
-}
-
 export interface MetricConfig {
-  label: string;
+  labelKey: string;
   unit: string;
   color: string;
   backgroundColor: string;
@@ -35,34 +48,21 @@ export interface MetricConfig {
 
 export const METRIC_CONFIG: Record<MetricType, MetricConfig> = {
   TEMPERATURE: {
-    label: 'Temperature',
+    labelKey: 'metric.temperature',
     unit: '°C',
     color: '#5aa9ff',
     backgroundColor: 'rgba(90, 169, 255, 0.15)'
   },
   PRESSURE: {
-    label: 'Pressure',
+    labelKey: 'metric.pressure',
     unit: 'bar',
     color: '#34d399',
     backgroundColor: 'rgba(52, 211, 153, 0.15)'
   },
   LEVEL: {
-    label: 'Level',
+    labelKey: 'metric.level',
     unit: '%',
     color: '#f59e0b',
     backgroundColor: 'rgba(245, 158, 11, 0.15)'
   }
 };
-
-export const METRIC_OPTIONS: MetricOption[] = [
-  { label: 'Temperature', value: 'TEMPERATURE' },
-  { label: 'Pressure', value: 'PRESSURE' },
-  { label: 'Level', value: 'LEVEL' }
-];
-
-export const TIME_RANGE_OPTIONS: TimeRangeOption[] = [
-  { label: 'Last 5 min', value: 'LAST_5_MINUTES' },
-  { label: 'Last 15 min', value: 'LAST_15_MINUTES' },
-  { label: 'Last 1 hour', value: 'LAST_1_HOUR' },
-  { label: 'Last 24 hours', value: 'LAST_24_HOURS' }
-];

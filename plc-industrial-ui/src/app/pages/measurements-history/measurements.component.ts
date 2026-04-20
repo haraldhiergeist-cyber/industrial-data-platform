@@ -1,4 +1,7 @@
 import { CommonModule } from '@angular/common';
+import { TranslationService } from '@/app/core/i18n/translation.service';
+import { LanguageService } from '@/app/core/i18n/language.service';
+import { buildMetricOptions, buildTimeRangeOptions } from './measurement.types';
 import {
   Component,
   OnInit,
@@ -15,12 +18,11 @@ import { SelectModule } from 'primeng/select';
 
 import { Chart } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
+import { TranslatePipe } from '@/app/core/i18n/translate.pipe';
 
 import { MeasurementsFacade } from './measurements.facade';
 import {
   METRIC_CONFIG,
-  METRIC_OPTIONS,
-  TIME_RANGE_OPTIONS,
   MeasurementHistoryItem,
   MetricOption,
   MetricType,
@@ -33,7 +35,7 @@ Chart.register(zoomPlugin);
 @Component({
   selector: 'app-measurements',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChartModule, SelectModule, ButtonModule],
+  imports: [CommonModule, FormsModule, ChartModule, SelectModule, ButtonModule, TranslatePipe],
   templateUrl: './measurements.component.html',
   styleUrl: './measurements.component.scss'
 })
@@ -44,13 +46,12 @@ export class MeasurementsComponent implements OnInit {
 
   readonly history = signal<MeasurementHistoryItem[]>([]);
   readonly loading = signal(false);
-  readonly error = signal('');
+  readonly errorKey = signal('');
 
   readonly selectedMetric = signal<MetricType>('TEMPERATURE');
   readonly selectedRange = signal<TimeRange>('LAST_1_HOUR');
 
-  readonly metricOptions: MetricOption[] = METRIC_OPTIONS;
-  readonly timeRangeOptions: TimeRangeOption[] = TIME_RANGE_OPTIONS;
+  
 
   readonly metricConfig = computed(() => METRIC_CONFIG[this.selectedMetric()]);
 
@@ -78,27 +79,27 @@ export class MeasurementsComponent implements OnInit {
   });
 
   readonly chartData = computed(() => {
-    const config = this.metricConfig();
+  const config = this.metricConfig();
 
-    return {
-      labels: this.history().map(item =>
-        new Date(item.timestamp).toLocaleTimeString('en-GB')
-      ),
-      datasets: [
-        {
-          label: config.label,
-          data: this.history().map(item => item.value),
-          borderColor: config.color,
-          backgroundColor: config.backgroundColor,
-          pointRadius: 0,
-          pointHoverRadius: 5,
-          borderWidth: 2,
-          tension: 0.25,
-          fill: true
-        }
-      ]
-    };
-  });
+  return {
+    labels: this.history().map(item =>
+      new Date(item.timestamp).toLocaleTimeString('en-GB')
+    ),
+    datasets: [
+      {
+        label: this.translationService.translate(config.labelKey),
+        data: this.history().map(item => item.value),
+        borderColor: config.color,
+        backgroundColor: config.backgroundColor,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        borderWidth: 2,
+        tension: 0.25,
+        fill: true
+      }
+    ]
+  };
+});
 
   readonly chartOptions = computed(() => {
     const config = this.metricConfig();
@@ -166,9 +167,20 @@ export class MeasurementsComponent implements OnInit {
     };
   });
 
-  ngOnInit(): void {
-    this.loadHistory();
-  }
+metricOptions: MetricOption[] = [];
+timeRangeOptions: TimeRangeOption[] = [];
+
+translationService = inject(TranslationService);
+languageService = inject(LanguageService);
+
+ async ngOnInit(): Promise<void> {
+  await this.translationService.init();
+
+  this.metricOptions = buildMetricOptions();
+  this.timeRangeOptions = buildTimeRangeOptions();
+
+  this.loadHistory();
+}
 
   onMetricChange(metric: MetricType): void {
     this.selectedMetric.set(metric);
@@ -185,22 +197,22 @@ export class MeasurementsComponent implements OnInit {
   }
 
   private loadHistory(): void {
-    this.loading.set(true);
-    this.error.set('');
+  this.loading.set(true);
+   this.errorKey.set('');
 
-    this.measurementsFacade
-      .getMeasurementHistory(this.selectedMetric(), this.selectedRange())
-      .subscribe({
-        next: data => {
-          this.history.set(data);
-          this.loading.set(false);
-          queueMicrotask(() => this.resetZoom());
-        },
-        error: err => {
-          console.error('Failed to load measurement history', err);
-          this.error.set('Failed to load measurement history.');
-          this.loading.set(false);
-        }
-      });
-  }
+  this.measurementsFacade
+    .getMeasurementHistory(this.selectedMetric(), this.selectedRange())
+    .subscribe({
+      next: data => {
+        this.history.set(data);
+        this.loading.set(false);
+        queueMicrotask(() => this.resetZoom());
+      },
+      error: err => {
+        console.error('Failed to load measurement history', err);
+        this.errorKey.set('measurements.loadError');
+        this.loading.set(false);
+      }
+    });
+ }
 }
