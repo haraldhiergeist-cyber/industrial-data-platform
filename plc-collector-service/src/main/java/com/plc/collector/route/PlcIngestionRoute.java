@@ -4,7 +4,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.springframework.stereotype.Component;
 
-import com.example.industrial.contracts.topic.Topics;
 import com.plc.collector.processor.PlcReadingEventProcessor;
 
 @Component

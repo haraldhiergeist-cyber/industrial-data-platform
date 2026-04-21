@@ -34,3 +34,15 @@ app:
 camel:
   main:
     run-controller: true			
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      enabled: true
+  health:
+    defaults:
+      enabled: true

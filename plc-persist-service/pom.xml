@@ -44,31 +44,37 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-liquibase</artifactId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.camel.springboot</groupId>
+		    <artifactId>camel-jackson3-starter</artifactId>
+		    <version>4.19.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-liquibase</artifactId>
+		</dependency> 
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-spring-boot-starter</artifactId>
-            <version>4.18.0</version>
+            <version>4.19.0</version>
         </dependency>
         <dependency>
             <groupId>com.example.industrial</groupId>
             <artifactId>industrial-data-platform-contracts</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <!--
         <dependency>
 		    <groupId>com.fasterxml.jackson.datatype</groupId>
 		    <artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
-        <dependency>
-	        <groupId>org.springframework.boot</groupId>
-	        <artifactId>spring-boot-starter-data-redis</artifactId>
-	    </dependency>
+		</dependency> -->
 		<dependency>
 	        <groupId>org.apache.camel.springboot</groupId>
 	        <artifactId>camel-kafka-starter</artifactId>
-            <version>4.18.0</version>
-		</dependency>	
+            <version>4.19.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -86,10 +92,13 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.camel.springboot</groupId>
-		    <artifactId>camel-jackson-starter</artifactId>
-            <version>4.18.0</version>
- 		</dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>io.micrometer</groupId>
+		    <artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
  		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
