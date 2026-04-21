@@ -56,23 +56,27 @@
 		<dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-spring-boot-starter</artifactId>
-            <version>4.18.0</version>
+            <version>4.19.0</version>
         </dependency>
 		<dependency>
 	        <groupId>org.apache.camel.springboot</groupId>
 	        <artifactId>camel-kafka-starter</artifactId>
-            <version>4.18.0</version>
+            <version>4.19.0</version>
 		</dependency>	
 		<dependency>
 		    <groupId>org.apache.camel.springboot</groupId>
 		    <artifactId>camel-jackson-starter</artifactId>
-            <version>4.18.0</version>
+            <version>4.19.0</version>
 		</dependency>
 		<dependency>
             <groupId>com.example.industrial</groupId>
             <artifactId>industrial-data-platform-contracts</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+		    <groupId>io.micrometer</groupId>
+		    <artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -82,12 +86,12 @@
 		<dependency>
 	        <groupId>org.apache.camel.springboot</groupId>
 	        <artifactId>camel-plc4x-starter</artifactId>
-            <version>4.18.0</version>
+            <version>4.19.0</version>
 		</dependency>
 	    <dependency>
 		    <groupId>org.apache.camel</groupId>
 		    <artifactId>camel-test-spring-junit5</artifactId>
-		    <version>4.18.0</version>
+		    <version>4.19.0</version>
 		    <scope>test</scope>
 		</dependency>
 		<dependency>
