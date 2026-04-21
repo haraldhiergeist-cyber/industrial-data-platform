@@ -10,6 +10,7 @@ import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '@/app/layout/service/layout.service';
 import { LanguageService, AppLanguage } from '@/app/core/i18n/language.service';
 import { TranslationService } from '@/app/core/i18n/translation.service';
+import { AuthService } from '@/app/core/auth/auth.service';
 
 @Component({
     selector: 'app-topbar',
@@ -89,10 +90,17 @@ import { TranslationService } from '@/app/core/i18n/translation.service';
                             <i class="pi pi-inbox"></i>
                             <span>Messages</span>
                         </button>
-                        <button type="button" class="layout-topbar-action">
+                       <button type="button" class="layout-topbar-action" (click)="onUserClick()">
                             <i class="pi pi-user"></i>
-                            <span>Profile</span>
+                            <span>{{ authService.authenticated() ? authService.username() : 'Login' }}</span>
                         </button>
+
+                        @if (authService.authenticated()) {
+                            <button type="button" class="layout-topbar-action" (click)="logout()">
+                                <i class="pi pi-sign-out"></i>
+                                <span>Logout</span>
+                            </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -105,6 +113,7 @@ export class AppTopbar {
     layoutService = inject(LayoutService);
     languageService = inject(LanguageService);
     translationService = inject(TranslationService);
+    authService = inject(AuthService);
 
     languageItems: MenuItem[] = [];
 
@@ -128,8 +137,18 @@ export class AppTopbar {
     }
 
     async setLanguage(language: AppLanguage): Promise<void> {
-     await this.translationService.changeLanguage(language);
-     this.buildLanguageItems();
+        await this.translationService.changeLanguage(language);
+        this.buildLanguageItems();
+    }
+
+   async onUserClick(): Promise<void> {
+        if (!this.authService.authenticated()) {
+            await this.authService.login(window.location.origin + '/');
+        }
+    }
+
+    async logout(): Promise<void> {
+        await this.authService.logout();
     }
 
     private buildLanguageItems(): void {

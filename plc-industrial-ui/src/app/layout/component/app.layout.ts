@@ -39,12 +39,14 @@ export class AppLayout {
     containerClass = computed(() => {
         const config = this.layoutService.layoutConfig();
         const state = this.layoutService.layoutState();
+
         return {
+            'app-dark': config.darkTheme,
             'layout-overlay': config.menuMode === 'overlay',
             'layout-static': config.menuMode === 'static',
             'layout-static-inactive': state.staticMenuDesktopInactive && config.menuMode === 'static',
             'layout-overlay-active': state.overlayMenuActive,
             'layout-mobile-active': state.mobileMenuActive
         };
-    })
+    });
 }

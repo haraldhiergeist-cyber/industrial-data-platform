@@ -29,7 +29,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "com.example.industrial.contracts.events"
-        spring.json.value.default.type: com.example.industrial.contracts.events.PlcReadingEvent			
+        spring.json.value.default.type: com.example.industrial.contracts.events.PlcReadingEvent
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://keycloak.cluster.lab/realms/industrial}   						
 server:
   port: ${SERVER_PORT:8082}
 

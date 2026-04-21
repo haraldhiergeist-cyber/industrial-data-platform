@@ -24,6 +24,7 @@
         "@tailwindcss/postcss": "^4.1.11",
         "chart.js": "^4.4.2",
         "chartjs-plugin-zoom": "^2.2.0",
+        "keycloak-js": "^26.2.3",
         "primeclt": "^0.1.5",
         "primeicons": "^7.0.0",
         "primeng": "^21.0.2",
