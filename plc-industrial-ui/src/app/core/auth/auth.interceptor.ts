@@ -5,6 +5,31 @@ import { switchMap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { environment } from '../../../environments/environment';
 
+const PUBLIC_API_PATH_PREFIXES = [
+  '/api/plc',
+  '/api/history'
+];
+
+function extractPathname(url: string): string {
+  try {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return new URL(url).pathname.toLowerCase();
+    }
+
+    return url.toLowerCase().split('?')[0];
+  } catch {
+    return url.toLowerCase().split('?')[0];
+  }
+}
+
+function isPublicApiEndpoint(url: string): boolean {
+  const pathname = extractPathname(url);
+
+  return PUBLIC_API_PATH_PREFIXES.some(prefix =>
+    pathname === prefix || pathname.startsWith(prefix + '/')
+  );
+}
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
@@ -13,6 +38,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const isConfiguredApiCall = apiBasePath ? req.url.startsWith(apiBasePath) : false;
 
   if (!isRelativeApiCall && !isConfiguredApiCall) {
+    return next(req);
+  }
+
+  if (isPublicApiEndpoint(req.url)) {
     return next(req);
   }
 
