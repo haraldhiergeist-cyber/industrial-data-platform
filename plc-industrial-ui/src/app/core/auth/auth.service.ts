@@ -31,12 +31,13 @@ export class AuthService {
     }
   }
 
-  async login(redirectUri?: string): Promise<void> {
-    await this.keycloak.login({
-      redirectUri: redirectUri ?? window.location.origin + '/',
-      prompt: 'login'
-    });
-  }
+  async login(): Promise<void> {
+  const redirectUrl = sessionStorage.getItem('redirectUrl') || '/';
+
+  await this.keycloak.login({
+    redirectUri: window.location.origin + redirectUrl
+  });
+}
 
   async logout(): Promise<void> {
     await this.keycloak.logout({
