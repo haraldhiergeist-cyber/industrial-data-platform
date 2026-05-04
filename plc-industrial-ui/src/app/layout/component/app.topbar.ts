@@ -143,7 +143,8 @@ export class AppTopbar {
 
    async onUserClick(): Promise<void> {
         if (!this.authService.authenticated()) {
-            await this.authService.login(window.location.origin + '/');
+            sessionStorage.setItem('redirectUrl', '/');
+            await this.authService.login();
         }
     }
 
