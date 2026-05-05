@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import Keycloak, { KeycloakProfile } from 'keycloak-js';
 import { keycloakConfig } from './keycloak.config';
 
@@ -18,6 +19,7 @@ export interface AuthDebugInfo {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly keycloak = new Keycloak(keycloakConfig);
+  private readonly router = inject(Router);
   private readonly loginAttemptStorageKey = 'loginRedirectAttempt';
   private readonly authDebugStorageKey = 'authDebugInfo';
   private readonly maxLoginAttempts = 2;
@@ -44,7 +46,10 @@ export class AuthService {
       onLoad: 'check-sso',
       pkceMethod: 'S256',
       responseMode: 'query',
-      checkLoginIframe: false
+      checkLoginIframe: false,
+      silentCheckSsoRedirectUri: this.toAbsoluteRedirectUri('/silent-check-sso.html'),
+      silentCheckSsoFallback: false,
+      messageReceiveTimeout: 1000
     });
 
     this.authenticated.set(loggedIn);
@@ -52,14 +57,13 @@ export class AuthService {
     if (loggedIn) {
       this.resetLoginAttempts();
       this.profile.set(await this.keycloak.loadUserProfile());
+      this.navigateToRememberedRedirectUrl();
     }
   }
 
   async login(): Promise<void> {
-    const redirectUrl = sessionStorage.getItem('redirectUrl') || '/';
-
     await this.keycloak.login({
-      redirectUri: this.toAbsoluteRedirectUri(redirectUrl)
+      redirectUri: this.toAbsoluteRedirectUri('/')
     });
   }
 
@@ -197,5 +201,16 @@ export class AuthService {
   private resetLoginAttempts(): void {
     sessionStorage.removeItem(this.loginAttemptStorageKey);
     sessionStorage.removeItem(this.authDebugStorageKey);
+  }
+
+  private navigateToRememberedRedirectUrl(): void {
+    const redirectUrl = sessionStorage.getItem('redirectUrl');
+
+    if (!redirectUrl || redirectUrl === '/') {
+      return;
+    }
+
+    sessionStorage.removeItem('redirectUrl');
+    queueMicrotask(() => void this.router.navigateByUrl(redirectUrl));
   }
 }
