@@ -2,10 +2,24 @@ import { Injectable, computed, signal } from '@angular/core';
 import Keycloak, { KeycloakProfile } from 'keycloak-js';
 import { keycloakConfig } from './keycloak.config';
 
+export interface AuthDebugInfo {
+  reason: string;
+  currentUrl: string;
+  documentBaseUri: string;
+  redirectUrl: string;
+  redirectUri: string;
+  keycloakUrl: string;
+  keycloakRealm: string;
+  keycloakClientId: string;
+  attemptCount?: number;
+  startedAt?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly keycloak = new Keycloak(keycloakConfig);
   private readonly loginAttemptStorageKey = 'loginRedirectAttempt';
+  private readonly authDebugStorageKey = 'authDebugInfo';
   private readonly maxLoginAttempts = 2;
   private readonly loginAttemptWindowMs = 60_000;
   private readonly keycloakCallbackParams = new Set([
@@ -57,6 +71,7 @@ export class AuthService {
     this.rememberRedirectUrl(url);
 
     if (!this.registerLoginAttempt(url)) {
+      this.rememberAuthDebugInfo('login-loop-stopped', url);
       return false;
     }
 
@@ -81,6 +96,20 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     return this.keycloak.hasRealmRole(role);
+  }
+
+  getAuthDebugInfo(): AuthDebugInfo | null {
+    const rawInfo = sessionStorage.getItem(this.authDebugStorageKey);
+
+    if (!rawInfo) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(rawInfo);
+    } catch {
+      return null;
+    }
   }
 
   private toAbsoluteRedirectUri(redirectUrl: string): string {
@@ -126,6 +155,27 @@ export class AuthService {
     return true;
   }
 
+  private rememberAuthDebugInfo(reason: string, url: string): void {
+    const redirectUrl = this.withoutKeycloakCallbackParams(url);
+    const attempt = this.readLoginAttempt();
+
+    sessionStorage.setItem(
+      this.authDebugStorageKey,
+      JSON.stringify({
+        reason,
+        currentUrl: window.location.href,
+        documentBaseUri: document.baseURI,
+        redirectUrl,
+        redirectUri: this.toAbsoluteRedirectUri(redirectUrl),
+        keycloakUrl: keycloakConfig.url,
+        keycloakRealm: keycloakConfig.realm,
+        keycloakClientId: keycloakConfig.clientId,
+        attemptCount: attempt?.count,
+        startedAt: attempt ? new Date(attempt.startedAt).toISOString() : undefined
+      })
+    );
+  }
+
   private readLoginAttempt(): {
     redirectUrl: string;
     count: number;
@@ -146,5 +196,6 @@ export class AuthService {
 
   private resetLoginAttempts(): void {
     sessionStorage.removeItem(this.loginAttemptStorageKey);
+    sessionStorage.removeItem(this.authDebugStorageKey);
   }
 }
