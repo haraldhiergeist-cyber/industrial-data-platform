@@ -1,15 +1,18 @@
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 
 export const adminGuard: CanActivateFn = async (_route, state) => {
   const auth = inject(AuthService);
+  const router = inject(Router);
 
   if (!auth.authenticated()) {
-    auth.rememberRedirectUrl(state.url);
-    await auth.login();
+    if (!(await auth.loginTo(state.url))) {
+      return router.parseUrl('/auth/error');
+    }
+
     return false;
   }
 
-  return auth.hasRole('admin');
+  return auth.hasRole('admin') || router.parseUrl('/auth/access');
 };

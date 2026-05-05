@@ -5,6 +5,9 @@ import { keycloakConfig } from './keycloak.config';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly keycloak = new Keycloak(keycloakConfig);
+  private readonly loginAttemptStorageKey = 'loginRedirectAttempt';
+  private readonly maxLoginAttempts = 2;
+  private readonly loginAttemptWindowMs = 60_000;
   private readonly keycloakCallbackParams = new Set([
     'code',
     'state',
@@ -33,6 +36,7 @@ export class AuthService {
     this.authenticated.set(loggedIn);
 
     if (loggedIn) {
+      this.resetLoginAttempts();
       this.profile.set(await this.keycloak.loadUserProfile());
     }
   }
@@ -47,6 +51,17 @@ export class AuthService {
 
   rememberRedirectUrl(url: string): void {
     sessionStorage.setItem('redirectUrl', this.withoutKeycloakCallbackParams(url));
+  }
+
+  async loginTo(url: string): Promise<boolean> {
+    this.rememberRedirectUrl(url);
+
+    if (!this.registerLoginAttempt(url)) {
+      return false;
+    }
+
+    await this.login();
+    return true;
   }
 
   async logout(): Promise<void> {
@@ -83,5 +98,53 @@ export class AuthService {
     }
 
     return `${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}`;
+  }
+
+  private registerLoginAttempt(url: string): boolean {
+    const redirectUrl = this.withoutKeycloakCallbackParams(url);
+    const now = Date.now();
+    const previous = this.readLoginAttempt();
+    const attempt =
+      previous &&
+      previous.redirectUrl === redirectUrl &&
+      now - previous.startedAt < this.loginAttemptWindowMs
+        ? previous
+        : { redirectUrl, count: 0, startedAt: now };
+
+    if (attempt.count >= this.maxLoginAttempts) {
+      return false;
+    }
+
+    sessionStorage.setItem(
+      this.loginAttemptStorageKey,
+      JSON.stringify({
+        ...attempt,
+        count: attempt.count + 1
+      })
+    );
+
+    return true;
+  }
+
+  private readLoginAttempt(): {
+    redirectUrl: string;
+    count: number;
+    startedAt: number;
+  } | null {
+    const rawAttempt = sessionStorage.getItem(this.loginAttemptStorageKey);
+
+    if (!rawAttempt) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(rawAttempt);
+    } catch {
+      return null;
+    }
+  }
+
+  private resetLoginAttempts(): void {
+    sessionStorage.removeItem(this.loginAttemptStorageKey);
   }
 }
