@@ -78,6 +78,9 @@
 
   @if (errorKey()) {
     <div class="state-message state-error">{{ errorKey() | translate }}</div>
+    @if (errorDetails()) {
+      <pre class="state-message state-error text-left overflow-auto">{{ errorDetails() }}</pre>
+    }
   }
 
   @if (!loading() && !errorKey() && history().length > 0) {
@@ -107,6 +110,6 @@
   }
 
  @if (!loading() && !errorKey() && history().length === 0) {
-  <div class="state-message">{{ errorKey() | translate }}</div>
+  <div class="state-message">{{ 'measurements.noData' | translate }}</div>
 }
 </div>

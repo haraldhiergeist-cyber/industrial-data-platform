@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { TranslationService } from '@/app/core/i18n/translation.service';
 import { LanguageService } from '@/app/core/i18n/language.service';
 import { buildMetricOptions, buildTimeRangeOptions } from './measurement.types';
@@ -47,6 +48,7 @@ export class MeasurementsComponent implements OnInit {
   readonly history = signal<MeasurementHistoryItem[]>([]);
   readonly loading = signal(false);
   readonly errorKey = signal('');
+  readonly errorDetails = signal('');
 
   readonly selectedMetric = signal<MetricType>('TEMPERATURE');
   readonly selectedRange = signal<TimeRange>('LAST_1_HOUR');
@@ -199,6 +201,7 @@ languageService = inject(LanguageService);
   private loadHistory(): void {
   this.loading.set(true);
    this.errorKey.set('');
+   this.errorDetails.set('');
 
   this.measurementsFacade
     .getMeasurementHistory(this.selectedMetric(), this.selectedRange())
@@ -211,8 +214,31 @@ languageService = inject(LanguageService);
       error: err => {
         console.error('Failed to load measurement history', err);
         this.errorKey.set('measurements.loadError');
+        this.errorDetails.set(this.formatErrorDetails(err));
         this.loading.set(false);
       }
     });
  }
+
+  private formatErrorDetails(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      return JSON.stringify(
+        {
+          status: err.status,
+          statusText: err.statusText,
+          url: err.url,
+          message: err.message,
+          error: typeof err.error === 'string' ? err.error : err.error ?? null
+        },
+        null,
+        2
+      );
+    }
+
+    if (err instanceof Error) {
+      return err.message;
+    }
+
+    return JSON.stringify(err, null, 2);
+  }
 }
