@@ -6,7 +6,7 @@ export const adminGuard: CanActivateFn = async (_route, state) => {
   const auth = inject(AuthService);
 
   if (!auth.authenticated()) {
-    sessionStorage.setItem('redirectUrl', state.url);
+    auth.rememberRedirectUrl(state.url);
     await auth.login();
     return false;
   }

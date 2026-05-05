@@ -5,6 +5,12 @@ import { keycloakConfig } from './keycloak.config';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly keycloak = new Keycloak(keycloakConfig);
+  private readonly keycloakCallbackParams = new Set([
+    'code',
+    'state',
+    'session_state',
+    'iss'
+  ]);
 
   readonly authenticated = signal(false);
   readonly profile = signal<KeycloakProfile | null>(null);
@@ -32,16 +38,20 @@ export class AuthService {
   }
 
   async login(): Promise<void> {
-  const redirectUrl = sessionStorage.getItem('redirectUrl') || '/';
+    const redirectUrl = sessionStorage.getItem('redirectUrl') || '/';
 
-  await this.keycloak.login({
-    redirectUri: window.location.origin + redirectUrl
-  });
-}
+    await this.keycloak.login({
+      redirectUri: this.toAbsoluteRedirectUri(redirectUrl)
+    });
+  }
+
+  rememberRedirectUrl(url: string): void {
+    sessionStorage.setItem('redirectUrl', this.withoutKeycloakCallbackParams(url));
+  }
 
   async logout(): Promise<void> {
     await this.keycloak.logout({
-      redirectUri: window.location.origin + '/'
+      redirectUri: this.toAbsoluteRedirectUri('/')
     });
   }
 
@@ -56,5 +66,22 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     return this.keycloak.hasRealmRole(role);
+  }
+
+  private toAbsoluteRedirectUri(redirectUrl: string): string {
+    return new URL(
+      this.withoutKeycloakCallbackParams(redirectUrl),
+      document.baseURI
+    ).toString();
+  }
+
+  private withoutKeycloakCallbackParams(url: string): string {
+    const redirectUrl = new URL(url, document.baseURI);
+
+    for (const param of this.keycloakCallbackParams) {
+      redirectUrl.searchParams.delete(param);
+    }
+
+    return `${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}`;
   }
 }
