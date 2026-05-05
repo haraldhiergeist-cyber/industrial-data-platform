@@ -9,6 +9,7 @@ export const authGuard: CanActivateFn = async (_route, state) => {
     return true;
   }
 
+  sessionStorage.setItem('redirectUrl', state.url);
   await auth.login();
   return false;
 };
