@@ -1,153 +1,239 @@
-# Industrial Data Platform
+# Industrial Data Platform Showcase
 
-Cloud-native platform for industrial PLC data acquisition, processing
-and visualization.
+Cloud-native Industrial IoT platform demonstrating modern industrial data acquisition, event-driven architecture, Kubernetes operations, GitOps deployment, security, and observability.
 
-The platform collects machine data from PLC systems, processes the data
-in real time, stores historical data, and provides APIs for industrial
-applications and user interfaces.
+The project showcases the complete technology stack from infrastructure to business application and serves as a reference implementation for modern industrial software platforms.
 
-## Overview
+# Industrial Data Platform Showcase
 
-Industrial systems often require two different types of data handling:
+Cloud-native Industrial IoT platform demonstrating modern industrial data acquisition, event-driven architecture, Kubernetes operations, GitOps deployment, security, and observability.
 
--   **Live state information** (current machine status)
--   **Historical data** (events, measurements, and production history)
+The project showcases the complete technology stack from infrastructure to business application and serves as a reference implementation for modern industrial software platforms.
 
-This platform separates both concerns and processes them through
-different layers.
+---
 
-PLC data is collected via **Apache PLC4X**, processed using **Apache
-Camel**, streamed through **Kafka**, and stored or cached depending on
-the use case.
+## Screenshots
 
-## Architecture
+### Industrial Dashboard
 
-PLC / Simulator │ ▼ PLC Collector Service (Spring Boot + Camel + PLC4X)
-│ ├──────────────► Redis (current machine state) │ ▼ Kafka Event
-Stream │ ▼ Historian Service │ ▼ Postgres Database │ ▼ REST APIs │ ▼
-Angular UI
+![Dashboard](docs/screenshots/dashboard.png)
 
-## Core Components
+### Historical Analysis
 
-### PLC Collector Service
+![History](docs/screenshots/history.png)
 
-Reads data from PLC systems and transforms raw signals into structured
-events.
+### Kubernetes Operations
 
-Responsibilities:
+![Rancher](docs/screenshots/rancher.png)
 
--   connect to PLC using PLC4X
--   read machine variables
--   detect state changes
--   publish events to Kafka
--   update live machine state in Infinispan
+### Infrastructure Layer
 
-### Historian Service
+![Harvester](docs/screenshots/harvester.png)
 
-Consumes events from Kafka and stores them in a relational database.
+---
 
-Responsibilities:
+## Documentation
 
--   consume event streams
--   transform event payloads
--   persist historical data in Postgres
+- [Overview](docs/01-overview.md)
+- [Architecture](docs/02-architecture.md)
+- [Platform Stack](docs/03-platform-stack.md)
+- [Data Flow](docs/04-data-flow.md)
+- [Deployment](docs/05-deployment.md)
+- [Security](docs/06-security.md)
+- [Observability](docs/07-observability.md)
+- [Demo Script](docs/08-demo-script.md)
 
-### State API Service
+---
 
-Provides access to the **current machine state** stored in Infinispan.
+## Key Features
 
-Responsibilities:
+### Industrial Connectivity
 
--   expose REST endpoints for live machine data
--   provide fast access for UI dashboards
+- Siemens PLC integration using Apache PLC4X
+- Industrial data acquisition
+- Real-time process monitoring
 
-### History API Service
+### Event-Driven Architecture
 
-Provides access to **historical machine data** stored in Postgres.
+- Apache Kafka as central event backbone
+- Decoupled microservices
+- Scalable data processing
 
-Responsibilities:
+### Real-Time Dashboards
 
--   query historical events
--   provide time-range queries
--   supply data for reporting and visualization
+- Angular frontend
+- WebSocket/STOMP updates
+- Live machine status visualization
 
-### Angular UI
+### Historical Data Analysis
 
-Industrial dashboard for visualizing machine states and historical data.
+- PostgreSQL persistence
+- Time-series visualization
+- Historical trend analysis
 
-Typical features:
+### Security
 
--   machine overview
--   live machine status
--   alarm visualization
--   production history
+- Keycloak
+- OAuth2
+- OpenID Connect
+- JWT-based authentication
+
+### Cloud-Native Operations
+
+- Kubernetes (RKE2)
+- Rancher
+- GitOps with Fleet
+- Harbor container registry
+
+### Observability
+
+- Prometheus
+- Grafana
+- Loki
+- Spring Boot Actuator
+
+---
+
+## Platform Stack
+
+```text
+Business Application
+        │
+        ▼
+Industrial Data Platform
+        │
+        ▼
+Platform Services
+(Kafka, Redis, PostgreSQL,
+ Keycloak, Grafana, Loki)
+        │
+        ▼
+Container Platform
+(Rancher, RKE2 Kubernetes)
+        │
+        ▼
+Infrastructure Layer
+(Harvester, Virtual Machines,
+ Networking, DNS, DHCP, TLS)
+        │
+        ▼
+Hardware Layer
+(Compute, Storage, Network)
+```
+
+The platform intentionally covers all layers required to build and operate a modern cloud-native industrial solution.
+
+---
+
+## High-Level Architecture
+
+```text
+PLC / Simulator
+        │
+        ▼
+PLC Collector Service
+(Spring Boot + Camel + PLC4X)
+        │
+        ▼
+Apache Kafka
+        │
+ ┌──────┴───────────┐
+ │                  │
+ ▼                  ▼
+
+PLC Persist      PLC Query
+Service          Service
+
+ │                  │
+ ▼                  ▼
+
+PostgreSQL       Redis
+                    │
+                    ▼
+
+             WebSocket/STOMP
+                    │
+                    ▼
+
+                Angular UI
+```
+
+---
 
 ## Technology Stack
 
-Backend
+### Application Layer
 
--   Java 21
--   Spring Boot
--   Apache Camel
--   Apache PLC4X
+- Java 21
+- Spring Boot
+- Apache Camel
+- Apache PLC4X
+- Angular
 
-Data & Messaging
+### Platform Services
 
--   Apache Kafka
--   Redis
--   PostgreSQL
+- Apache Kafka
+- Redis
+- PostgreSQL
+- Keycloak
 
-Frontend
+### Observability
 
--   Angular
+- Prometheus
+- Grafana
+- Loki
 
-Platform
+### Container Platform
 
--   Docker
--   Kubernetes
--   Rancher
--   GitOps (Fleet)
+- Rancher
+- RKE2 Kubernetes
+
+### Infrastructure
+
+- Harvester
+- KVM Virtualization
+
+### DevOps
+
+- GitLab CI/CD
+- Harbor
+- Fleet GitOps
+
+
+---
 
 ## Repository Structure
 
-industrial-data-platform │ ├── plc-collector-service ├──
-historian-writer-service ├── state-api-service ├── history-api-service
-├── shared-model ├── shared-camel └── angular-ui
+```text
+industrial-data-platform
 
-## Development Roadmap
+├── plc-collector-service
+├── plc-query-service
+├── plc-persist-service
+├── plc-industrial-ui
+├── shared-model
+├── shared-camel
+└── docs
+```
 
-Phase 1\
-PLC simulator integration and data collection.
+---
 
-Phase 2\
-Kafka event streaming and historical persistence.
+## Purpose
 
-Phase 3\
-State and history APIs.
+This project demonstrates how a traditional industrial application can evolve into a modern cloud-native platform using:
 
-Phase 4\
-Angular dashboard.
+- Event-driven architecture
+- Platform engineering
+- Kubernetes
+- GitOps
+- Security
+- Observability
+- Industrial protocol integration
 
-Phase 5\
-Deployment on Kubernetes using GitOps.
+The showcase intentionally combines software development, infrastructure engineering, DevOps, and cloud-native operations into a single end-to-end solution.
 
-## Purpose of this Project
-
-This project demonstrates how a traditional industrial application can
-evolve from a monolithic architecture into a modern cloud-native
-platform using event-driven microservices.
-
-Key goals:
-
--   industrial protocol integration
--   event-driven architecture
--   scalable data processing
--   real-time state management
--   historical data analysis
--   cloud-native deployment
+---
 
 ## License
 
-This project is provided as a technical showcase and architecture
-example.
+This project is provided as a technical showcase and architecture reference implementation.
